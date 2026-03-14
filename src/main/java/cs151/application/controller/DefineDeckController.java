@@ -30,6 +30,9 @@ public class DefineDeckController {
     private Label promptMsgLbl;
 
 
+    /**
+     * Disables the Create Deck button until the text field is filled by the user.
+     */
     public void initialize() {
         createDeckBtn.disableProperty().bind(deckNameField.textProperty().isEmpty());
     }
