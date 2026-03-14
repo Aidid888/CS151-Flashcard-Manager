@@ -4,9 +4,9 @@
 # who did what:
 
 # Version: 0.2
-1. Aiden Tat: Exit home button, Define deck cleanup, Review
-2. Andrew Song: Initialize homepage, Homepage and Define-Deck views, Review
-3. Katherine Shih: Navigation between pages, Styling, Review
+1. Aiden Tat: Exit back buttons, Define deck cleanup, Review
+2. Andrew Song: Initialize homepage, Homepage and Define Deck views, Review
+3. Katherine Shih: Page Navigation, Fixed buttons and text fields, Review
 
 # Technical-Spec
 1. Aiden Tat: Project Manager, Class Diagram, Review
@@ -20,6 +20,6 @@
 
 
 # Any other instruction that users need to know:
-
+1. N/A
 
 

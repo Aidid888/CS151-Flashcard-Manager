@@ -1,5 +1,7 @@
-package cs151.application;
+package cs151.application.controller;
 
+import cs151.application.Main;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 
@@ -13,17 +15,23 @@ public class MainController {
     @FXML
     private Label flashcardTitle;
 
+    /**
+     * The operation instantiates homepage once the program is initialized.
+     */
     @FXML
     public void initialize() {
         flashcardTitle.setText("Flashcard Manager");
     }
 
+    /**
+     * The operation redirects the user to the Define Deck page.
+     */
     @FXML
     protected void goToDefineDeckOp(ActionEvent event) {
         try {
 
             FXMLLoader loader = new FXMLLoader(
-                    Main.class.getResource("define-deck-view.fxml"));
+                    Main.class.getResource("view/define-deck-view.fxml"));
 
             Scene scene = new Scene(loader.load(), 600, 400);
 
@@ -37,6 +45,14 @@ public class MainController {
         catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * The operation terminates the program.
+     */
+    @FXML
+    protected void onCloseButtonClickOp() {
+        Platform.exit();
     }
 
 }
