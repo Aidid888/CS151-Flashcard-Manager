@@ -12,5 +12,5 @@
     </padding>
 
     <Label fx:id="flashcardTitle" style="-fx-font-size: 36px;"/>
-    <Button text="Define New Deck" style="-fx-font-size: 24px;" onAction="#goToDefineDeck"/>
+    <Button text="Define New Deck" style="-fx-font-size: 24px;" onAction="#goToDefineDeckOp"/>
 </VBox>

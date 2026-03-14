@@ -19,7 +19,7 @@ public class MainController {
     }
 
     @FXML
-    protected void goToDefineDeck(ActionEvent event) {
+    protected void goToDefineDeckOp(ActionEvent event) {
         try {
 
             FXMLLoader loader = new FXMLLoader(

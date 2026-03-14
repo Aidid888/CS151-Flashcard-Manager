@@ -12,6 +12,9 @@
         <Insets bottom="20" left="20" right="20" top="20"/>
     </padding>
 
+    <Button fx:id= "exitHomeBtn" text="Exit to Home"
+            onAction="#onExitButtonClickOp"/>
+
     <Label text="Create Flashcard Deck"/>
 
     <TextField fx:id="deckNameField" promptText="Deck Name"/>
