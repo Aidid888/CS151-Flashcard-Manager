@@ -5,6 +5,8 @@ module cs151.application {
     requires com.dlsc.formsfx;
     requires java.desktop;
     requires java.sql;
+    requires org.slf4j;
+    requires org.xerial.sqlitejdbc;
 
     opens cs151.application to javafx.fxml;
     exports cs151.application;

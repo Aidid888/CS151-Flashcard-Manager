@@ -6,11 +6,15 @@
 
 <?import javafx.scene.control.Button?>
 <VBox alignment="TOP_CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml"
-      fx:controller="cs151.application.MainController">
+      fx:controller="cs151.application.controller.MainController">
     <padding>
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
     </padding>
 
     <Label fx:id="flashcardTitle" style="-fx-font-size: 36px;"/>
-    <Button text="Define New Deck" style="-fx-font-size: 24px;" onAction="#goToDefineDeck"/>
+
+    <Button text="Define New Deck" style="-fx-font-size: 24px;" onAction="#goToDefineDeckOp"/>
+    <Button text="Edit Deck" style="-fx-font-size: 24px;"/>
+    <Button text="Review Deck" style="-fx-font-size: 24px;"/>
+    <Button text="Close Program" style="-fx-font-size: 24px;" onAction="#onCloseButtonClickOp"/>
 </VBox>

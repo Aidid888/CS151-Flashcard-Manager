@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox alignment="CENTER" spacing="15"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="cs151.application.controller.DefineDeckController">
+
+    <padding>
+        <Insets bottom="20" left="20" right="20" top="20"/>
+    </padding>
+
+    <Button text="Exit to Home"
+            onAction="#onExitButtonClickOp"/>
+
+    <Label text="Create Flashcard Deck"/>
+
+    <TextField fx:id="deckNameField" promptText="Deck Name (required)"/>
+    <TextArea fx:id="descriptionField" promptText="Description (optional)"/>
+
+    <Button fx:id="createDeckBtn" text="Create Deck"
+            onAction="#createDeckOp"/>
+
+    <Label fx:id="promptMsgLbl" text="please provide the Deck a new name first" style="-fx-text-fill: #b84747"/>
+
+</VBox>

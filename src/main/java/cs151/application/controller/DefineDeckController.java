@@ -11,6 +11,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import cs151.application.database.DeckDao;
 
 /**
  * Controller for Define Deck page.
@@ -37,6 +38,8 @@ public class DefineDeckController {
         createDeckBtn.disableProperty().bind(deckNameField.textProperty().isEmpty());
     }
 
+
+    private final DeckDao deckDao = new DeckDao();
 
     /**
      * The operation returns the user back to homepage.
@@ -67,19 +70,33 @@ public class DefineDeckController {
      */
     @FXML
     private void createDeckOp(ActionEvent event) {
-
         try {
-            String name = deckNameField.getText();
-            String description = descriptionField.getText();
+            String name = deckNameField.getText().trim();
+            String description = descriptionField.getText().trim();
+
+            // --- Validate: name cannot be empty ---
+            if (name.isEmpty()) {
+                promptMsgLbl.setText("Deck name cannot be empty.");
+                return;
+            }
+
+            // --- Validate: name must be unique ---
+            if (deckDao.getDeckByName(name) != null) {
+                promptMsgLbl.setText("A deck named \"" + name + "\" already exists.");
+                return;
+            }
+
+            // --- Save to database ---
+            deckDao.insertDeck(name, description.isEmpty() ? null : description);
 
             System.out.println("Deck Created:");
             System.out.println("Name: " + name);
             System.out.println("Description: " + description);
 
             promptMsgLbl.setText("New Deck \"" + name + "\" successfully created");
-        }
 
-        catch(Exception e) {
+        } catch (Exception e) {
+            promptMsgLbl.setText("Error: " + e.getMessage());
             System.out.println(e.getMessage());
         }
     }
