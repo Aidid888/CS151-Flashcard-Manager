@@ -14,7 +14,7 @@ public class Main extends Application {
         DatabaseController.initialize(System.getProperty("user.dir") + "/flashcards.db");
 
         FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("view/home-view.fxml"));
-        Scene scene = new Scene(fxmlLoader.load(), 600, 400);
+        Scene scene = new Scene(fxmlLoader.load(), 600, 500);
         stage.setTitle("Flashcard Manager");
         stage.setScene(scene);
         stage.show();

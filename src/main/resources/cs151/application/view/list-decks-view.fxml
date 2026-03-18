@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.geometry.Insets?>
+
+<VBox spacing="10" alignment="CENTER"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="cs151.application.controller.ListDeckController">
+
+    <padding>
+        <Insets top="20" bottom="20" left="20" right="20"/>
+    </padding>
+
+    <Button text="Back to Home" onAction="#goBackHome"/>
+
+    <Label text="All Decks" style="-fx-font-size: 20px;"/>
+
+    <TableView fx:id="deckTable" prefWidth="500">
+
+        <columns>
+            <TableColumn fx:id="nameColumn" text="Deck Name" prefWidth="200"/>
+            <TableColumn fx:id="descColumn" text="Description" prefWidth="300"/>
+        </columns>
+
+    </TableView>
+
+</VBox>

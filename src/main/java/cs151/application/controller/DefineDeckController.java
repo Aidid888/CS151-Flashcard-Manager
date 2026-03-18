@@ -51,7 +51,7 @@ public class DefineDeckController {
             FXMLLoader loader = new FXMLLoader(
                     Main.class.getResource("view/home-view.fxml"));
 
-            Scene scene = new Scene(loader.load(), 600, 400);
+            Scene scene = new Scene(loader.load(), 600, 500);
 
             Stage stage = (Stage)((Node)event.getSource())
                     .getScene().getWindow();

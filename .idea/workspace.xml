@@ -5,24 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4e9a5e29-9e74-4df2-9728-07924ef4c78b" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/dataSources.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/cs151/application/database/DatabaseController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/cs151/application/database/DeckDao.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/cs151/application/database/FlashcardDao.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/cs151/application/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cs151/application/Main.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/cs151/application/controller/DefineDeckController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cs151/application/controller/DefineDeckController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/module-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/module-info.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/cs151/application/DefineDeckController.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/cs151/application/controller/MainController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/cs151/application/controller/MainController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/cs151/application/view/home-view.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/cs151/application/view/home-view.fxml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/cs151/application/Main.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/cs151/application/Main.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/cs151/application/MainController.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/cs151/application/define-deck-view.fxml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/cs151/application/home-view.fxml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/module-info.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/module-info.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/cs151/application/controller/DefineDeckController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/cs151/application/controller/DefineDeckController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/cs151/application/controller/MainController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/cs151/application/controller/MainController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/cs151/application/view/home-view.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/cs151/application/view/home-view.fxml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -56,7 +47,7 @@
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "SaveDatabase",
     "ignore.virus.scanning.warn.message": "true",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Users/Aiden/OneDrive - sjsu.edu/SJSU Classes/Spring 2026/CS 151/CS151-Flashcard-Manager",
@@ -110,6 +101,10 @@
       <workItem from="1773535147391" duration="124000" />
       <workItem from="1773535399537" duration="53000" />
       <workItem from="1773724868338" duration="9385000" />
+      <workItem from="1773867830967" duration="866000" />
+      <workItem from="1773869634386" duration="262000" />
+      <workItem from="1773869911934" duration="238000" />
+      <workItem from="1773873707310" duration="1740000" />
     </task>
     <servers />
   </component>
