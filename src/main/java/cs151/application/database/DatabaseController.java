@@ -27,6 +27,7 @@ public class DatabaseController {
     private static final String CREATE_FLASHCARD_TABLE = """
             CREATE TABLE IF NOT EXISTS Flashcard_table (
                 id            INTEGER PRIMARY KEY AUTOINCREMENT,
+                deck_id       INTEGER NOT NULL,
                 deck_name     TEXT    NOT NULL,
                 front_text    TEXT    NOT NULL,
                 back_text     TEXT    NOT NULL,
