@@ -16,5 +16,7 @@
     <Button text="Define New Deck" style="-fx-font-size: 24px;" onAction="#goToDefineDeckOp"/>
     <Button text="Edit Deck" style="-fx-font-size: 24px;"/>
     <Button text="Review Deck" style="-fx-font-size: 24px;"/>
+    <Button text="View Decks" style="-fx-font-size: 24px;" onAction="#goToListDecksOp"/>
     <Button text="Close Program" style="-fx-font-size: 24px;" onAction="#onCloseButtonClickOp"/>
+
 </VBox>

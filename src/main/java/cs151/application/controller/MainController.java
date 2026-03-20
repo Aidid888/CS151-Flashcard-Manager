@@ -47,6 +47,26 @@ public class MainController {
         }
     }
 
+    @FXML
+    protected void goToListDecksOp(ActionEvent event) {
+        try {
+
+            FXMLLoader loader = new FXMLLoader(
+                    Main.class.getResource("view/list-decks-view.fxml"));
+
+            Scene scene = new Scene(loader.load(), 600, 500);
+
+            Stage stage = (Stage)((Node)event.getSource())
+                    .getScene().getWindow();
+
+            stage.setScene(scene);
+            stage.show();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     /**
      * The operation terminates the program.
      */

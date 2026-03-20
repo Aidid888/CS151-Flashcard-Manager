@@ -1,7 +1,3 @@
-# IntelliJ
-.idea
-.idea/workspace.xml
-
-# Maven / Java build output
+/flashcards.db
+.idea/
 target/
-*.class
