@@ -1,0 +1,50 @@
+/* General styling */
+.root {
+    -fx-background-color: #d3ddf0;
+}
+
+.button {
+    -fx-font-size: 12px;
+    -fx-font-family: "Microsoft JhengHei UI";
+}
+
+.back-btn {
+    -fx-font-family: "Microsoft YaHei UI Light";
+}
+
+.title-label {
+    -fx-font-size: 16px;
+    -fx-font-family: "Microsoft JhengHei UI";
+    -fx-font-weight: bold;
+}
+
+
+/* home-view styling */
+#flashcardTitle {
+    -fx-font-size: 36px;
+    -fx-font-family: "Microsoft JhengHei UI";
+    -fx-font-weight: bold;
+}
+
+.home-btns {
+    -fx-font-size: 24px;
+}
+
+
+/* define-deck-view styling */
+#deckNameField {
+    -fx-font-size: 12px;
+    -fx-font-family: "Microsoft JhengHei UI Bold";
+}
+
+.prompt-label {
+    -fx-font-size: 12px;
+    -fx-font-family: "Microsoft JhengHei UI Bold";
+    -fx-text-fill: #b84747;
+}
+
+
+/* list-decks-view styling*/
+#deckTable {
+    -fx-background-color: #f2f1f4;
+}

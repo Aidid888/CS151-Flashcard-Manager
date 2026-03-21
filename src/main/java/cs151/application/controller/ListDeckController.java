@@ -33,6 +33,8 @@ public class ListDeckController {
     @FXML
     public void initialize() {
 
+        deckTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
+
         nameColumn.setCellValueFactory(cellData ->
                 new javafx.beans.property.SimpleStringProperty(
                         cellData.getValue().deckName()

@@ -1,7 +1,12 @@
 # Name of application: Flashcard Manager
-### Version: 0.2
+### Version: 0.4
 
 ## Who did what:
+
+### Version: 0.4
+1. Aiden Tat: Developed database
+2. Andrew Song: Developed view all deck page
+3. Katherine Shih: Designed view all deck page
 
 ### Version: 0.2
 1. Aiden Tat: Designed buttons and navigation

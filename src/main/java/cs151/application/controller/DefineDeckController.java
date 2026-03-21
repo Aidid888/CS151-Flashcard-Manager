@@ -36,6 +36,7 @@ public class DefineDeckController {
      */
     public void initialize() {
         createDeckBtn.disableProperty().bind(deckNameField.textProperty().isEmpty());
+        descriptionField.setWrapText(true);
     }
 
 
@@ -88,10 +89,6 @@ public class DefineDeckController {
 
             // --- Save to database ---
             deckDao.insertDeck(name, description.isEmpty() ? null : description);
-
-            System.out.println("Deck Created:");
-            System.out.println("Name: " + name);
-            System.out.println("Description: " + description);
 
             promptMsgLbl.setText("New Deck \"" + name + "\" successfully created");
 

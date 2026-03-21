@@ -1,22 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.VBox?>
 
-<?import javafx.scene.control.Button?>
-<VBox alignment="TOP_CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml"
+<VBox alignment="TOP_CENTER"
+      spacing="20.0"
+      styleClass="home-root"
+      stylesheets="@../../../css/styles.css"
+      xmlns="http://javafx.com/javafx/23"
+      xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="cs151.application.controller.MainController">
+
     <padding>
-        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
     </padding>
 
-    <Label fx:id="flashcardTitle" style="-fx-font-size: 36px;"/>
+    <Label fx:id="flashcardTitle"/>
 
-    <Button text="Define New Deck" style="-fx-font-size: 24px;" onAction="#goToDefineDeckOp"/>
-    <Button text="Edit Deck" style="-fx-font-size: 24px;"/>
-    <Button text="Review Deck" style="-fx-font-size: 24px;"/>
-    <Button text="View Decks" style="-fx-font-size: 24px;" onAction="#goToListDecksOp"/>
-    <Button text="Close Program" style="-fx-font-size: 24px;" onAction="#onCloseButtonClickOp"/>
-
+    <Button text="Define New Deck" styleClass="home-btns" onAction="#goToDefineDeckOp"/>
+    <Button text="Edit Deck" styleClass="home-btns"/>
+    <Button text="Review Deck" styleClass="home-btns"/>
+    <Button text="View All Decks" styleClass="home-btns" onAction="#goToListDecksOp"/>
+    <Button text="Close Program" styleClass="home-btns" onAction="#onCloseButtonClickOp"/>
 </VBox>
