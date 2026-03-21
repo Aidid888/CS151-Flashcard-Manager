@@ -13,9 +13,10 @@
 }
 
 .title-label {
-    -fx-font-size: 16px;
+    -fx-font-size: 24px;
     -fx-font-family: "Microsoft JhengHei UI";
     -fx-font-weight: bold;
+    -fx-padding: 10px;
 }
 
 

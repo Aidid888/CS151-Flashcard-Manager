@@ -13,31 +13,34 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.paint.Color?>
 
-   <BorderPane prefHeight="500.0"
-               prefWidth="600.0"
-               styleClass="root"
-               stylesheets="@../../../css/styles.css"
-               xmlns="http://javafx.com/javafx/23"
-               xmlns:fx="http://javafx.com/fxml/1"
-               fx:controller="cs151.application.controller.DefineDeckController">
+<BorderPane prefWidth="600.0"
+            prefHeight="500.0"
+            styleClass="root"
+            stylesheets="@../../../css/styles.css"
+            xmlns="http://javafx.com/javafx/23"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="cs151.application.controller.DefineDeckController">
 
        <padding>
-           <Insets bottom="20" left="20" right="20" top="20" />
+           <Insets bottom="20" left="20" right="20" top="10" />
        </padding>
 
         <top>
-            <HBox prefHeight="51.0" prefWidth="362.0" BorderPane.alignment="CENTER">
+            <HBox>
                 <children>
+
                     <Label prefHeight="22.0" prefWidth="495.0" styleClass="title-label" text="Create Flashcard Deck" textAlignment="JUSTIFY">
                         <HBox.margin>
-                            <Insets bottom="50.0" top="10.0" />
+                            <Insets bottom="10.0"/>
                         </HBox.margin>
                     </Label>
+
                     <ToolBar prefHeight="40.0" prefWidth="167.0">
                         <items>
-                            <Button onAction="#onExitButtonClickOp" styleClass="back-btn" text="⌂ Back to Home" />
+                            <Button text="⌂ Back to Home" styleClass="back-btn" onAction="#onExitButtonClickOp"/>
                         </items>
                     </ToolBar>
+
                 </children>
             </HBox>
         </top>
@@ -45,33 +48,41 @@
     <center>
          <Pane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
             <children>
-               <Pane styleClass="pane-layer" layoutX="100.0" layoutY="-3.0" prefHeight="207.0" prefWidth="360.0">
+
+               <Pane layoutX="100.0" layoutY="-3.0" prefHeight="274.0" prefWidth="379.0" styleClass="pane-layer">
                   <children>
-                     <Pane styleClass="pane-layer" layoutX="-8.0" layoutY="-13.0" prefHeight="207.0" prefWidth="360.0">
+
+                     <Pane layoutX="-15.0" layoutY="-13.0" prefHeight="256.0" prefWidth="373.0" styleClass="pane-layer">
                         <effect>
-                           <DropShadow height="29.76" offsetX="5.0" offsetY="5.0" radius="15.594999999999999" width="34.62">
+                           <DropShadow height="29.76" offsetX="5.0" offsetY="5.0" radius="15.59" width="34.62">
                               <color>
-                                 <Color red="0.41999998688697815" green="0.3779999911785126" blue="0.3779999911785126" opacity="0.6116752028465271" />
+                                 <Color red="0.42" green="0.38" blue="0.378" opacity="0.61" />
                               </color>
                            </DropShadow>
                         </effect>
+
                         <children>
-                           <VBox layoutX="26.0" layoutY="14.0" prefHeight="179.0" prefWidth="309.0">
+                           <VBox layoutX="29.0" layoutY="24.0" prefHeight="208.0" prefWidth="309.0">
                               <children>
-                                  <TextField fx:id="deckNameField" promptText="Deck Name (required)" />
-                                  <TextArea fx:id="descriptionField" prefHeight="168.0" prefWidth="292.0" promptText="Description (optional)" />
+                                  <TextField fx:id="deckNameField" focusTraversable="false" promptText="Deck Name (required)">
+                                 <VBox.margin>
+                                    <Insets bottom="15.0" />
+                                 </VBox.margin></TextField>
+                                  <TextArea fx:id="descriptionField" focusTraversable="false" prefHeight="168.0" prefWidth="292.0" promptText="Description (optional)"/>
                               </children>
                            </VBox>
                         </children>
                      </Pane>
                   </children>
+
                   <effect>
-                     <DropShadow height="29.76" offsetX="5.0" offsetY="5.0" radius="15.594999999999999" width="34.62">
+                     <DropShadow height="29.76" offsetX="5.0" offsetY="5.0" radius="16" width="35">
                         <color>
-                           <Color red="0.41999998688697815" green="0.3779999911785126" blue="0.3779999911785126" opacity="0.6116752028465271" />
+                           <Color red="0.42" green="0.38" blue="0.38" opacity="0.60" />
                         </color>
                      </DropShadow>
                   </effect>
+
                </Pane>
             </children>
          </Pane>
@@ -80,11 +91,10 @@
         <bottom>
             <VBox alignment="center" prefHeight="55.0" prefWidth="260.0" BorderPane.alignment="CENTER">
                 <children>
-                    <Button fx:id="createDeckBtn" text="➕ Create Deck" onAction="#createDeckOp" alignment="CENTER"/>
-                    <Label fx:id="promptMsgLbl" styleClass="prompt-label" text="please provide the Deck a new name first" alignment="CENTER"/>
+                    <Button fx:id="createDeckBtn" text="➕ Create Deck" alignment="CENTER" onAction="#createDeckOp"/>
+                    <Label fx:id="promptMsgLbl" text="please provide the Deck a new name first" alignment="CENTER" styleClass="prompt-label"/>
                 </children>
             </VBox>
         </bottom>
 
     </BorderPane>
-

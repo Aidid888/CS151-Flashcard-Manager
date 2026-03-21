@@ -1,6 +1,7 @@
 package cs151.application.controller;
 
 import cs151.application.Main;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;

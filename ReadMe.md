@@ -5,8 +5,8 @@
 
 ### Version: 0.4
 1. Aiden Tat: Developed database
-2. Andrew Song: Developed view all deck page
-3. Katherine Shih: Designed view all deck page
+2. Andrew Song: Developed table view page
+3. Katherine Shih: Designed list and define deck, fixed text fields
 
 ### Version: 0.2
 1. Aiden Tat: Designed buttons and navigation
