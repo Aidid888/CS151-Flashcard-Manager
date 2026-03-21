@@ -23,11 +23,7 @@
 
    <ButtonBar prefHeight="40.0" prefWidth="200.0">
      <buttons>
-         <ToolBar prefHeight="40.0" prefWidth="117.0">
-           <items>
-               <Button onAction="#goBackHome" styleClass="back-btn" text="⌂ Back to Home" />
-           </items>
-         </ToolBar>
+         <Button onAction="#goBackHome" styleClass="back-btn" text="⌂ Back to Home" />
      </buttons>
    </ButtonBar>
 

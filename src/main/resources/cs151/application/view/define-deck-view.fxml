@@ -29,17 +29,13 @@
             <HBox>
                 <children>
 
-                    <Label prefHeight="22.0" prefWidth="495.0" styleClass="title-label" text="Create Flashcard Deck" textAlignment="JUSTIFY">
+                    <Label prefHeight="22.0" prefWidth="450.0" styleClass="title-label" text="Create Flashcard Deck" textAlignment="JUSTIFY">
                         <HBox.margin>
                             <Insets bottom="10.0"/>
                         </HBox.margin>
                     </Label>
 
-                    <ToolBar prefHeight="40.0" prefWidth="167.0">
-                        <items>
-                            <Button text="⌂ Back to Home" styleClass="back-btn" onAction="#onExitButtonClickOp"/>
-                        </items>
-                    </ToolBar>
+                    <Button text="⌂ Back to Home" styleClass="back-btn" onAction="#onExitButtonClickOp"/>
 
                 </children>
             </HBox>
