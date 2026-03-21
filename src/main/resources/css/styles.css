@@ -43,6 +43,10 @@
     -fx-text-fill: #b84747;
 }
 
+.pane-layer {
+    -fx-background-color: #d7d4de;
+}
+
 
 /* list-decks-view styling*/
 #deckTable {

@@ -11,10 +11,10 @@
 
 <VBox alignment="CENTER"
       spacing="10"
-      styleClass="table-root"
+      styleClass="root"
       stylesheets="@../../../css/styles.css"
-      xmlns:fx="http://javafx.com/fxml/1"
       xmlns="http://javafx.com/javafx/23"
+      xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="cs151.application.controller.ListDeckController">
 
     <padding>
@@ -23,15 +23,15 @@
 
    <ButtonBar prefHeight="40.0" prefWidth="200.0">
      <buttons>
-         <ToolBar prefHeight="40.0" prefWidth="105.0">
+         <ToolBar prefHeight="40.0" prefWidth="117.0">
            <items>
-               <Button text="Back to Home" styleClass="back-btn" onAction="#goBackHome"/>
+               <Button onAction="#goBackHome" styleClass="back-btn" text="⌂ Back to Home" />
            </items>
          </ToolBar>
      </buttons>
    </ButtonBar>
 
-    <Label style="-fx-font-size: 20px;" text="All Decks" styleClass="title-label"/>
+    <Label style="-fx-font-size: 20px;" styleClass="title-label" text="All Decks" />
 
     <TableView fx:id="deckTable" prefWidth="500">
 
