@@ -20,7 +20,7 @@
     <Label fx:id="flashcardTitle"/>
 
     <Button text="Define New Deck" styleClass="home-btns" onAction="#goToDefineDeckOp"/>
-    <Button text="Edit Deck" styleClass="home-btns"/>
+<!--    <Button text="Edit Deck" styleClass="home-btns" onAction="#goToEditDecksOp"/>-->
     <Button text="Review Deck" styleClass="home-btns"/>
     <Button text="View All Decks" styleClass="home-btns" onAction="#goToListDecksOp"/>
     <Button text="Close Program" styleClass="home-btns" onAction="#onCloseButtonClickOp"/>
