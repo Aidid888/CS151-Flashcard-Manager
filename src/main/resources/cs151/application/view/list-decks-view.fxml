@@ -7,11 +7,6 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.layout.HBox?>
-
-<?import com.sun.javafx.scene.control.ContextMenuContent.ArrowMenuItem?>
-<?import javafx.scene.control.MenuButton?>
-<?import javafx.scene.control.MenuItem?>
 
 <VBox alignment="CENTER"
       spacing="10"

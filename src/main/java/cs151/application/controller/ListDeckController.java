@@ -65,6 +65,28 @@ public class ListDeckController {
         }
     }
 
+    // User clicks on delete button, which deletes the row from the table and database
+    @FXML
+    private void deleteDeck(ActionEvent event) {
+        deckDao.deleteDeck();
+    }
+
+    // User clicks on edit button, which allows user to edit the name and description from the tableview
+    // Changes are also reflected in the database
+    @FXML
+    private void updateDeck(ActionEvent event) {
+        deckTable.setEditable(true);
+
+         curRow = ;
+
+        nameColumn.setCellFactory();
+        nameColumn.setOnEditCommit();
+
+        descColumn.setCellFactory();
+
+        deckDao.updateDeck(String oldDeckName, String newDeckName, String newDescription);
+    }
+
     @FXML
     private void goBackHome(ActionEvent event) {
         try {

@@ -1,6 +1,7 @@
 package cs151.application.controller;
 
 import cs151.application.Main;
+import cs151.application.database.DeckDao;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -9,7 +10,9 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 
-public class FlashcardController {
+public class DefineFlashcardController {
+
+    private final DeckDao deckDao = new DeckDao();
 
     @FXML
     public void initialize() {}
