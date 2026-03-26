@@ -100,15 +100,26 @@ public class DeckDao {
      * all linked flashcards automatically update to the new name.
      */
     public void updateDeck(String oldDeckName, String newDeckName, String newDescription) throws SQLException {
-        String sql = "UPDATE Deck_table SET deck_name = ?, description = ? WHERE deck_name = ?";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        // Update the deck itself
+        String updateDeckSql = "UPDATE Deck_table SET deck_name = ?, description = ? WHERE deck_name = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(updateDeckSql)) {
             stmt.setString(1, newDeckName);
             stmt.setString(2, newDescription);
             stmt.setString(3, oldDeckName);
             stmt.executeUpdate();
             logger.info("Updated deck: {} → {}", oldDeckName, newDeckName);
         }
+
+        // Manually sync deck_name in all linked flashcards
+        String syncFlashcardsSql = "UPDATE Flashcard_table SET deck_name = ? WHERE deck_name = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(syncFlashcardsSql)) {
+            stmt.setString(1, newDeckName);
+            stmt.setString(2, oldDeckName);
+            stmt.executeUpdate();
+            logger.info("Synced deck_name in Flashcard_table: {} → {}", oldDeckName, newDeckName);
+        }
     }
+
 
     // ---------------------------------------------------------
     // DELETE
