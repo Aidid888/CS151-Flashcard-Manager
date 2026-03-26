@@ -34,7 +34,7 @@ public class DatabaseController {
                 status        TEXT    NOT NULL DEFAULT 'new',
                 creation_date TEXT    NOT NULL DEFAULT (datetime('now')),
                 last_viewed   TEXT,
-                FOREIGN KEY (deck_name) REFERENCES Deck_table(deck_name)
+                FOREIGN KEY (deck_id) REFERENCES Deck_table(id)
                     ON UPDATE CASCADE ON DELETE CASCADE
             );
             """;
