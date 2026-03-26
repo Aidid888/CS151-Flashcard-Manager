@@ -20,7 +20,9 @@
 }
 
 
-/* home-view styling */
+/*
+* Home page styling
+*/
 #flashcardTitle {
     -fx-font-size: 36px;
     -fx-font-family: "Microsoft JhengHei UI";
@@ -32,7 +34,7 @@
 }
 
 
-/* define-deck-view styling */
+/* Define Deck styling */
 #deckNameField {
     -fx-font-size: 12px;
     -fx-font-family: "Microsoft JhengHei UI Bold";
@@ -49,7 +51,32 @@
 }
 
 
-/* list-decks-view styling*/
-#deckTable {
-    -fx-background-color: #f2f1f4;
+/* Define Flashcards styling */
+#form-card {
+    -fx-background-color: #f9f9f9;
+    -fx-border-color: #ddd;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+}
+
+.choose-deck-label {
+    -fx-font-size: 13px; -fx-text-fill: #666;
+}
+
+.field-labels {
+    -fx-font-weight: bold;
+}
+
+.error-labels {
+    -fx-text-fill: #c0392b;
+    -fx-font-size: 11px;
+}
+
+#successLabel {
+    -fx-text-fill: #27ae60;
+    -fx-font-size: 12px;
+}
+
+
+.primary-btn {
 }

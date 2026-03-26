@@ -47,32 +47,59 @@ public class MainController {
         }
     }
 
-//    @FXML
-//    protected void goToEditDecksOp(ActionEvent event) {
-//        try {
-//
-//            FXMLLoader loader = new FXMLLoader(
-//                    Main.class.getResource("view/define-flashcard-view.fxml"));
-//
-//            Scene scene = new Scene(loader.load(), 600, 500);
-//
-//            Stage stage = (Stage)((Node)event.getSource())
-//                    .getScene().getWindow();
-//
-//            stage.setScene(scene);
-//            stage.show();
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
-
+    /**
+     * The operation redirects the user to the List Deck page.
+     */
     @FXML
     protected void goToListDecksOp(ActionEvent event) {
         try {
 
             FXMLLoader loader = new FXMLLoader(
                     Main.class.getResource("view/list-decks-view.fxml"));
+
+            Scene scene = new Scene(loader.load(), 600, 500);
+
+            Stage stage = (Stage)((Node)event.getSource())
+                    .getScene().getWindow();
+
+            stage.setScene(scene);
+            stage.show();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * The operation redirects the user to the Define Flashcards page.
+     */
+    public void goToDefineFlashcardsOp(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    Main.class.getResource("view/define-flashcard-view.fxml"));
+
+            Scene scene = new Scene(loader.load(), 600, 500);
+
+            Stage stage = (Stage)((Node)event.getSource())
+                    .getScene().getWindow();
+
+            stage.setScene(scene);
+            stage.show();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * The operation redirects the user to the List Flashcards page.
+     */
+    @FXML
+    protected void goToListFLashcardsOp(ActionEvent event) {
+        try {
+
+            FXMLLoader loader = new FXMLLoader(
+                    Main.class.getResource("view/list-flashcards-view.fxml"));
 
             Scene scene = new Scene(loader.load(), 600, 500);
 

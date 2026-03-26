@@ -17,11 +17,14 @@
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
     </padding>
 
+    <!-- Title -->
     <Label fx:id="flashcardTitle"/>
 
+    <!-- Navigation Buttons -->
     <Button text="Define New Deck" styleClass="home-btns" onAction="#goToDefineDeckOp"/>
-<!--    <Button text="Edit Deck" styleClass="home-btns" onAction="#goToEditDecksOp"/>-->
+    <Button text="Define New Flashcard" styleClass="home-btns" onAction="#goToDefineFlashcardsOp"/>
     <Button text="Review Decks" styleClass="home-btns"/>
     <Button text="View All or Edit Decks" styleClass="home-btns" onAction="#goToListDecksOp"/>
+    <Button text="View All Flashcards" styleClass="home-btns" onAction="#goToListFLashcardsOp"/>
     <Button text="Close Program" styleClass="home-btns" onAction="#onCloseButtonClickOp"/>
 </VBox>

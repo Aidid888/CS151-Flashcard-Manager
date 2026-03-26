@@ -11,106 +11,97 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.paint.Color?>
-
 <?import javafx.scene.control.ButtonBar?>
 <?import javafx.scene.layout.StackPane?>
-<BorderPane prefWidth="600.0"
-            prefHeight="500.0"
-            styleClass="root"
-            stylesheets="@../../../css/styles.css"
-            xmlns="http://javafx.com/javafx/23"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="cs151.application.controller.DefineDeckController">
+
+<VBox alignment="TOP_CENTER"
+      spacing="16"
+      styleClass="root"
+      stylesheets="@../../../css/styles.css"
+      xmlns="http://javafx.com/javafx/23"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="cs151.application.controller.DefineDeckController">
 
     <padding>
         <Insets bottom="20" left="30" right="30" top="10" />
     </padding>
 
-    <top>
-        <VBox>
-            <ButtonBar>
-                <buttons>
-                    <Button text="⌂ Back to Home"
-                            styleClass="back-btn"
-                            onAction="#onExitButtonClickOp"/>
-                </buttons>
-            </ButtonBar>
+    <ButtonBar>
+        <buttons>
+            <Button text="⌂ Back to Home"
+                    styleClass="back-btn"
+                    onAction="#onExitButtonClickOp"/>
+        </buttons>
+    </ButtonBar>
 
-            <Label text="Create Flashcard Deck" prefHeight="22.0" prefWidth="450.0"
-                   styleClass="title-label" textAlignment="JUSTIFY">
-                <HBox.margin>
-                    <Insets bottom="10.0"/>
-                </HBox.margin>
-            </Label>
+    <Label text="Create Flashcard Deck" prefHeight="22.0" prefWidth="450.0"
+           styleClass="title-label" textAlignment="JUSTIFY">
+        <HBox.margin>
+            <Insets bottom="10.0"/>
+        </HBox.margin>
+    </Label>
+
+    <StackPane BorderPane.alignment="CENTER" prefWidth="560.0" prefHeight="300.0">
+
+        <!-- Back layer -->
+        <Pane prefWidth="360.0" prefHeight="256.0"
+              styleClass="pane-layer"
+              translateX="-6.0" translateY="6.0">
+            <effect>
+                <DropShadow height="29.76" width="34.62"
+                            offsetX="5.0" offsetY="5.0"
+                            radius="15.59">
+                    <color>
+                        <Color red="0.42" green="0.38" blue="0.38" opacity="0.60" />
+                    </color>
+                </DropShadow>
+            </effect>
+        </Pane>
+
+        <!-- Front layer -->
+        <VBox prefWidth="380.0" prefHeight="260.0"
+              spacing="15.0" styleClass="pane-layer"
+              StackPane.alignment="CENTER"
+              translateX="6.0" translateY="-6.0">
+
+            <padding>
+                <Insets top="24.0" right="28.0" bottom="24.0" left="28.0"/>
+            </padding>
+
+            <effect>
+                <DropShadow height="29.76" width="34.62"
+                            offsetX="5.0" offsetY="5.0"
+                            radius="15.59">
+                    <color>
+                        <Color red="0.42" green="0.38" blue="0.378" opacity="0.61"/>
+                    </color>
+                </DropShadow>
+            </effect>
+
+            <TextField fx:id="deckNameField"
+                       promptText="Deck Name (required)"/>
+
+            <TextArea fx:id="descriptionField"
+                      promptText="Description (optional)"
+                      wrapText="true"
+                      VBox.vgrow="ALWAYS"/>
         </VBox>
-    </top>
+    </StackPane>
 
-    <center>
-        <StackPane BorderPane.alignment="CENTER" prefWidth="560.0" prefHeight="300.0">
+    <VBox alignment="center" prefHeight="55.0" prefWidth="260.0"
+          BorderPane.alignment="CENTER">
 
-            <!-- back layer -->
-            <Pane prefWidth="360.0" prefHeight="256.0"
-                  styleClass="pane-layer"
-                  translateX="-6.0" translateY="6.0">
-                <effect>
-                    <DropShadow height="29.76" width="34.62"
-                                offsetX="5.0" offsetY="5.0"
-                                radius="15.59">
-                        <color>
-                            <Color red="0.42" green="0.38" blue="0.38" opacity="0.60" />
-                        </color>
-                    </DropShadow>
-                </effect>
-            </Pane>
+        <padding>
+            <Insets top="24.0"/>
+        </padding>
 
-            <!-- front layer -->
-            <VBox prefWidth="380.0" prefHeight="260.0"
-                  spacing="15.0" styleClass="pane-layer"
-                  StackPane.alignment="CENTER"
-                  translateX="6.0" translateY="-6.0">
-
-                <padding>
-                    <Insets top="24.0" right="28.0" bottom="24.0" left="28.0"/>
-                </padding>
-
-                <effect>
-                    <DropShadow height="29.76" width="34.62"
-                                offsetX="5.0" offsetY="5.0"
-                                radius="15.59">
-                        <color>
-                            <Color red="0.42" green="0.38" blue="0.378" opacity="0.61"/>
-                        </color>
-                    </DropShadow>
-                </effect>
-
-                <TextField fx:id="deckNameField"
-                           promptText="Deck Name (required)"/>
-
-                <TextArea fx:id="descriptionField"
-                          promptText="Description (optional)"
-                          wrapText="true"
-                          VBox.vgrow="ALWAYS"/>
-            </VBox>
-        </StackPane>
-      </center>
-
-        <bottom>
-            <VBox alignment="center" prefHeight="55.0" prefWidth="260.0"
-                  BorderPane.alignment="CENTER">
-                <padding>
-                    <Insets top="24.0"/>
-                </padding>
-                <children>
-                    <Button fx:id="createDeckBtn"
-                            text="➕ Create Deck"
-                            alignment="CENTER"
-                            onAction="#createDeckOp"/>
-                    <Label fx:id="promptMsgLbl"
-                           text="please provide the Deck a new name first"
-                           alignment="CENTER"
-                           styleClass="prompt-label"/>
-                </children>
-            </VBox>
-        </bottom>
-
-</BorderPane>
+        <Button fx:id="createDeckBtn"
+                text="➕ Create Deck"
+                alignment="CENTER"
+                onAction="#createDeckOp"/>
+        <Label fx:id="promptMsgLbl"
+               text="please provide the Deck a new name first"
+               alignment="CENTER"
+               styleClass="prompt-label"/>
+    </VBox>
+</VBox>

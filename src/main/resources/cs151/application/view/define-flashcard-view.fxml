@@ -1,62 +1,83 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.MenuButton?>
-<?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.layout.AnchorPane?>
 
-<?import javafx.scene.layout.StackPane?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.effect.DropShadow?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 
-<?import javafx.scene.paint.Color?>
-<?import javafx.scene.control.TextArea?>
-<?import javafx.scene.control.TextField?>
+<VBox alignment="TOP_CENTER"
+      spacing="16"
+      styleClass="root"
+      stylesheets="@../../../css/styles.css"
+      xmlns="http://javafx.com/javafx/23"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="cs151.application.controller.DefineFlashcardController">
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0"
-            styleClass="root"
-            stylesheets="@../../../css/styles.css"
-            xmlns="http://javafx.com/javafx/23"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="cs151.application.controller.DefineFlashcardController">
+    <padding>
+        <Insets bottom="20" left="30" right="30" top="10" />
+    </padding>
 
-    <StackPane prefWidth="560.0" prefHeight="300.0">
+    <!-- Top bar -->
+    <ButtonBar prefHeight="40">
+        <buttons>
+            <Button onAction="#onExitButtonClickOp"
+                    styleClass="back-btn"
+                    text="⌂ Back to Home" />
+        </buttons>
+    </ButtonBar>
 
-        <!-- card -->
-        <VBox prefWidth="380.0" prefHeight="260.0"
-              spacing="15.0" styleClass="pane-layer"
-              StackPane.alignment="CENTER"
-              translateX="6.0" translateY="-6.0">
+    <!-- Title -->
+    <Label text="Add Flashcard" styleClass="title-label"/>
 
-            <padding>
-                <Insets top="24.0" right="28.0" bottom="24.0" left="28.0"/>
-            </padding>
+    <!-- Form card -->
+    <VBox id="form-card" maxWidth="620">
+        <padding>
+            <Insets bottom="20" left="20" right="20" top="20" />
+        </padding>
 
-            <effect>
-                <DropShadow height="29.76" width="34.62"
-                            offsetX="5.0" offsetY="5.0"
-                            radius="15.59">
-                    <color>
-                        <Color red="0.42" green="0.38" blue="0.378" opacity="0.61"/>
-                    </color>
-                </DropShadow>
-            </effect>
+        <!-- Deck selection -->
+        <Label styleClass="field-labels" text="Deck *" />
+        <ComboBox fx:id="deckComboBox"
+                  promptText="Select a deck…"
+                  prefWidth="300" />
+        <Label fx:id="deckErrorLabel" styleClass="error-labels" />
 
-            <Button layoutX="448.0" layoutY="31.0" onAction="#onExitButtonClickOp" styleClass="back-btn" text="⌂ Back to Home" />
-            <MenuButton layoutX="134.0" layoutY="107.0" mnemonicParsing="false" text="MenuButton">
-                <items>
-                    <MenuItem mnemonicParsing="false" text="Action 1" />
-                    <MenuItem mnemonicParsing="false" text="Action 2" />
-                </items>
-            </MenuButton>
+        <!-- Front Text -->
+        <Label styleClass="field-labels" text="Front Text *" />
+        <TextArea fx:id="frontTextArea"
+                  promptText="Enter the question or term…"
+                  prefHeight="100"
+                  wrapText="true" />
+        <Label fx:id="frontErrorLabel" styleClass="error-labels" />
 
-            <TextField fx:id="deckNameField"
-                       promptText="Deck Name (required)"/>
+        <!-- Back Text -->
+        <Label styleClass="field-labels" text="Back Text *" />
+        <TextArea fx:id="backTextArea"
+                  promptText="Enter the answer or definition…"
+                  prefHeight="100"
+                  wrapText="true" />
+        <Label fx:id="backErrorLabel" styleClass="error-labels" />
 
-            <TextArea fx:id="descriptionField"
-                      promptText="Description (optional)"
-                      wrapText="true"
-                      VBox.vgrow="ALWAYS"/>
-        </VBox>
-    </StackPane>
-</AnchorPane>
+        <!-- Status -->
+        <Label text="Status *" styleClass="field-labels" />
+        <ComboBox fx:id="statusComboBox"
+                  promptText="Select status"
+                  prefWidth="200" />
+        <Label fx:id="statusErrorLabel" styleClass="error-labels" />
+
+    </VBox>
+
+    <!-- Action buttons -->
+    <HBox spacing="10" alignment="CENTER_RIGHT" maxWidth="620">
+        <Button onAction="#onClearFields"
+                text="Clear"
+                prefWidth="90" />
+        <Button onAction="#onSaveFlashcard"
+                text="Save Flashcard"
+                styleClass="primary-btn"
+                prefWidth="140" />
+    </HBox>
+
+    <!-- Success message -->
+    <Label fx:id="successLabel" />
+
+</VBox>
