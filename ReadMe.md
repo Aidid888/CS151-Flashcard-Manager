@@ -4,9 +4,9 @@
 ## Who did what:
 
 ### Version: 0.5
-1. Aiden Tat:  
-2. Andrew Song:  
-3. Katherine Shih: 
+1. Aiden Tat: Added FlashcardDAO
+2. Andrew Song: List Flashcard Page
+3. Katherine Shih: Define Flashcard Page, List Flashcard Page
 
 ### Version: 0.4
 1. Aiden Tat: Developed database
