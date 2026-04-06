@@ -29,8 +29,9 @@
     <MenuButton fx:id="viewEditMenuBtn" text="View/Edit" styleClass="home-btns">
         <items>
             <MenuItem text="Decks" onAction="#goToListDecksOp"/>
-            <MenuItem text="Flashcards" onAction="#goToListFLashcardsOp"/>
+            <MenuItem text="Flashcards" onAction="#goToListFlashcardsOp"/>
         </items>
     </MenuButton>
+    <Button text="Search Flashcards" styleClass="home-btns" onAction="#goToSearchFlashcardsOp"/>
     <Button text="Close Program" styleClass="home-btns" onAction="#onCloseButtonClickOp"/>
 </VBox>

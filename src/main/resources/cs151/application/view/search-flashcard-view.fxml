@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox alignment="TOP_CENTER"
+      spacing="10"
+      styleClass="root"
+      stylesheets="@../../../css/styles.css"
+      xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="cs151.application.controller.SearchFlashcardController"
+      prefHeight="500.0" prefWidth="700.0">
+
+    <padding>
+        <Insets bottom="20" left="20" right="20" top="20" />
+    </padding>
+
+    <!-- Navigation -->
+    <ButtonBar prefHeight="40">
+        <buttons>
+            <Button onAction="#goBackHomeOp"
+                    styleClass="back-btn"
+                    text="⌂ Back to Home" />
+        </buttons>
+    </ButtonBar>
+
+    <!-- Title -->
+    <Label styleClass="title-label" text="Search All Flashcards" />
+
+    <Label text="Search is case-insensitive. Matches Deck Name, Front Text, Back Text, and Status." />
+
+    <!-- Live search field — fx:id wires it to the controller -->
+    <HBox alignment="CENTER_LEFT" spacing="10">
+        <TextField fx:id="searchField"
+                   promptText="Type to search…"
+                   HBox.hgrow="ALWAYS" />
+    </HBox>
+
+    <!-- Results table -->
+    <TableView fx:id="flashcardTable" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="deckNameColumn"     prefWidth="130" text="Deck" />
+            <TableColumn fx:id="frontTextColumn"    prefWidth="175" text="Front Text" />
+            <TableColumn fx:id="backTextColumn"     prefWidth="175" text="Back Text" />
+            <TableColumn fx:id="statusColumn"       prefWidth="90"  text="Status" />
+            <TableColumn fx:id="creationDateColumn" prefWidth="130" text="Created" />
+            <TableColumn fx:id="lastViewedColumn"   prefWidth="130" text="Last Reviewed" />
+            <TableColumn fx:id="deleteColumn"       prefWidth="80"  text="Action" />
+        </columns>
+    </TableView>
+
+</VBox>

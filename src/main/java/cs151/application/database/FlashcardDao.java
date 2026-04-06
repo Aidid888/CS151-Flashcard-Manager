@@ -227,6 +227,41 @@ public class FlashcardDao {
     }
 
     // ---------------------------------------------------------
+    // SEARCH
+    // ---------------------------------------------------------
+
+    /**
+     * Returns all flashcards where deck_name, front_text, back_text, or status
+     * contains the keyword (case-insensitive). An empty keyword matches everything,
+     * effectively returning all flashcards. Results are ordered by deck_name, then
+     * creation_date so the table groups naturally by deck.
+     *
+     * @param keyword the search term; may be empty but never null
+     */
+    public List<Flashcard> searchFlashcards(String keyword) throws SQLException {
+        String sql = """
+            SELECT id, deck_id, deck_name, front_text, back_text,
+                   status, creation_date, last_viewed
+            FROM Flashcard_table
+            WHERE LOWER(deck_name)  LIKE LOWER(?)
+               OR LOWER(front_text) LIKE LOWER(?)
+               OR LOWER(back_text)  LIKE LOWER(?)
+               OR LOWER(status)     LIKE LOWER(?)
+            ORDER BY deck_name ASC, creation_date ASC
+            """;
+        String pattern = "%" + keyword + "%";
+        List<Flashcard> results = new ArrayList<>();
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            // All four LIKE clauses share the same wildcard pattern
+            for (int i = 1; i <= 4; i++) stmt.setString(i, pattern);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) results.add(mapRow(rs));
+            }
+        }
+        return results;
+    }
+
+    // ---------------------------------------------------------
     // PRIVATE HELPERS
     // ---------------------------------------------------------
 

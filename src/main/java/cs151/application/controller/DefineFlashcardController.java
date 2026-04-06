@@ -111,7 +111,7 @@ public class DefineFlashcardController {
      * Returns the user back to the home page.
      */
     @FXML
-    protected void onExitButtonClickOp(ActionEvent event) {
+    protected void goBackHomeOp(ActionEvent event) {
         try {
             FXMLLoader loader = new FXMLLoader(
                     Main.class.getResource("view/home-view.fxml"));

@@ -23,7 +23,7 @@
     <!-- Back to Home button -->
     <ButtonBar prefHeight="40.0" prefWidth="200.0">
      <buttons>
-         <Button onAction="#goBackHome" styleClass="back-btn" text="⌂ Back to Home" />
+         <Button onAction="#goBackHomeOp" styleClass="back-btn" text="⌂ Back to Home" />
      </buttons>
    </ButtonBar>
 

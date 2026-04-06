@@ -6,7 +6,6 @@
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.effect.DropShadow?>
-<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
@@ -30,7 +29,7 @@
         <buttons>
             <Button text="⌂ Back to Home"
                     styleClass="back-btn"
-                    onAction="#onExitButtonClickOp"/>
+                    onAction="#goBackHomeOp"/>
         </buttons>
     </ButtonBar>
 
@@ -41,7 +40,7 @@
         </HBox.margin>
     </Label>
 
-    <StackPane BorderPane.alignment="CENTER" prefWidth="560.0" prefHeight="300.0">
+    <StackPane prefWidth="560.0" prefHeight="300.0">
 
         <!-- Back layer -->
         <Pane prefWidth="360.0" prefHeight="256.0"
@@ -88,8 +87,7 @@
         </VBox>
     </StackPane>
 
-    <VBox alignment="center" prefHeight="55.0" prefWidth="260.0"
-          BorderPane.alignment="CENTER">
+    <VBox alignment="center" prefHeight="55.0" prefWidth="260.0">
 
         <padding>
             <Insets top="24.0"/>

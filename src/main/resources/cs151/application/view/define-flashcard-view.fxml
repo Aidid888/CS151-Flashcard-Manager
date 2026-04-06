@@ -19,7 +19,7 @@
     <!-- Top bar -->
     <ButtonBar prefHeight="40">
         <buttons>
-            <Button onAction="#onExitButtonClickOp"
+            <Button onAction="#goBackHomeOp"
                     styleClass="back-btn"
                     text="⌂ Back to Home" />
         </buttons>

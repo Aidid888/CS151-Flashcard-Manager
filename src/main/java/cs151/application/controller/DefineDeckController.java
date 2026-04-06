@@ -46,7 +46,7 @@ public class DefineDeckController {
      * The operation returns the user back to homepage.
      */
     @FXML
-    protected void onExitButtonClickOp(ActionEvent event) {
+    protected void goBackHomeOp(ActionEvent event) {
         try {
 
             FXMLLoader loader = new FXMLLoader(

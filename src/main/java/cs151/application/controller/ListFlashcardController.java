@@ -38,7 +38,7 @@ public class ListFlashcardController {
             FXCollections.observableArrayList();
 
     /**
-     * Initialization
+     * Initializes TableView for list of Flashcards and ComboBox for Deck selection.
      */
 
     @FXML
@@ -139,7 +139,7 @@ public class ListFlashcardController {
      * The operation returns the user back to homepage.
      */
     @FXML
-    private void goBackHome(ActionEvent event) {
+    private void goBackHomeOp(ActionEvent event) {
         try {
             FXMLLoader loader = new FXMLLoader(
                     Main.class.getResource("view/home-view.fxml"));

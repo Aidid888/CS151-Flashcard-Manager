@@ -93,7 +93,7 @@ public class ListDeckController {
      * The operation returns the user back to homepage.
      */
     @FXML
-    private void goBackHome(ActionEvent event) {
+    private void goBackHomeOp(ActionEvent event) {
         try {
             FXMLLoader loader = new FXMLLoader(
                     Main.class.getResource("view/home-view.fxml"));

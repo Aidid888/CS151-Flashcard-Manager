@@ -48,8 +48,6 @@ public class MainController {
         }
     }
 
-
-
     /**
      * The operation redirects the user to the Define Flashcards page.
      */
@@ -70,6 +68,7 @@ public class MainController {
             e.printStackTrace();
         }
     }
+
     @FXML
     private MenuButton viewEditMenuBtn;
 
@@ -100,7 +99,7 @@ public class MainController {
      * The operation redirects the user to the List Flashcards page.
      */
     @FXML
-    protected void goToListFLashcardsOp(ActionEvent event) {
+    protected void goToListFlashcardsOp(ActionEvent event) {
         try {
             FXMLLoader loader = new FXMLLoader(
                     Main.class.getResource("view/list-flashcards-view.fxml"));
@@ -118,11 +117,32 @@ public class MainController {
     }
 
     /**
+     * The operation redirects the user to the Search Flashcards page.
+     * @param event
+     */
+    public void goToSearchFlashcardsOp(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    Main.class.getResource("view/search-flashcard-view.fxml"));
+
+            Scene scene = new Scene(loader.load(), 600, 500);
+
+            Stage stage = (Stage)((Node)event.getSource())
+                    .getScene().getWindow();
+
+            stage.setScene(scene);
+            stage.show();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
      * The operation terminates the program.
      */
     @FXML
     protected void onCloseButtonClickOp() {
         Platform.exit();
     }
-
 }
