@@ -18,9 +18,11 @@ public class DatabaseController {
 
     private static final String CREATE_DECK_TABLE = """
             CREATE TABLE IF NOT EXISTS Deck_table (
-                id          INTEGER PRIMARY KEY AUTOINCREMENT,
-                deck_name   TEXT    NOT NULL UNIQUE,
-                description TEXT
+                id            INTEGER PRIMARY KEY AUTOINCREMENT,
+                deck_name     TEXT    NOT NULL UNIQUE,
+                description   TEXT,
+                creation_date TEXT    NOT NULL DEFAULT (datetime('now')),
+                last_visited  TEXT
             );
             """;
 
@@ -34,7 +36,7 @@ public class DatabaseController {
                 status        TEXT    NOT NULL DEFAULT 'new',
                 creation_date TEXT    NOT NULL DEFAULT (datetime('now')),
                 last_viewed   TEXT,
-                FOREIGN KEY (deck_name) REFERENCES Deck_table(deck_name)
+                FOREIGN KEY (deck_id) REFERENCES Deck_table(id)
                     ON UPDATE CASCADE ON DELETE CASCADE
             );
             """;
@@ -91,6 +93,7 @@ public class DatabaseController {
 
     /**
      * Creates Deck_table and Flashcard_table if they don't already exist.
+     * Also migrates existing databases to add new columns if missing.
      * Safe to call on every startup — IF NOT EXISTS prevents duplicates.
      */
     private void createTables() {
@@ -99,6 +102,11 @@ public class DatabaseController {
             logger.info("Deck_table ready.");
             stmt.execute(CREATE_FLASHCARD_TABLE);
             logger.info("Flashcard_table ready.");
+
+            // Migrate existing databases — safe to run every startup
+            try { stmt.execute("ALTER TABLE Deck_table ADD COLUMN creation_date TEXT NOT NULL DEFAULT (datetime('now'))"); } catch (SQLException ignored) {}
+            try { stmt.execute("ALTER TABLE Deck_table ADD COLUMN last_visited TEXT"); } catch (SQLException ignored) {}
+
         } catch (SQLException e) {
             logger.error("Failed to create tables: {}", e.getMessage(), e);
             throw new RuntimeException("Table creation failed.", e);

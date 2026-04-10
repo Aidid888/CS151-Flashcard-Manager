@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox alignment="TOP_CENTER"
+      spacing="16"
+      styleClass="root"
+      stylesheets="@../../../css/styles.css"
+      xmlns="http://javafx.com/javafx/23"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="cs151.application.controller.DefineFlashcardController">
+
+    <padding>
+        <Insets bottom="20" left="30" right="30" top="10" />
+    </padding>
+
+    <!-- Top bar -->
+    <ButtonBar prefHeight="40">
+        <buttons>
+            <Button onAction="#goBackHomeOp"
+                    styleClass="back-btn"
+                    text="⌂ Back to Home" />
+        </buttons>
+    </ButtonBar>
+
+    <!-- Title -->
+    <Label text="Add Flashcard" styleClass="title-label"/>
+
+    <!-- Form card -->
+    <VBox id="form-card" maxWidth="620">
+        <padding>
+            <Insets bottom="20" left="20" right="20" top="20" />
+        </padding>
+
+        <!-- Deck selection -->
+        <Label styleClass="field-labels" text="Deck *" />
+        <ComboBox fx:id="deckComboBox"
+                  promptText="Select a deck…"
+                  prefWidth="300" />
+        <Label fx:id="deckErrorLabel" styleClass="error-labels" />
+
+        <!-- Front Text -->
+        <Label styleClass="field-labels" text="Front Text *" />
+        <TextArea fx:id="frontTextArea"
+                  promptText="Enter the question or term…"
+                  prefHeight="100"
+                  wrapText="true" />
+        <Label fx:id="frontErrorLabel" styleClass="error-labels" />
+
+        <!-- Back Text -->
+        <Label styleClass="field-labels" text="Back Text *" />
+        <TextArea fx:id="backTextArea"
+                  promptText="Enter the answer or definition…"
+                  prefHeight="100"
+                  wrapText="true" />
+        <Label fx:id="backErrorLabel" styleClass="error-labels" />
+
+        <!-- Status -->
+        <Label text="Status *" styleClass="field-labels" />
+        <ComboBox fx:id="statusComboBox"
+                  promptText="Select status"
+                  prefWidth="200" />
+        <Label fx:id="statusErrorLabel" styleClass="error-labels" />
+
+    </VBox>
+
+    <!-- Action buttons -->
+    <HBox spacing="10" alignment="CENTER_RIGHT" maxWidth="620">
+        <Button onAction="#onClearFields"
+                text="Clear"
+                prefWidth="90" />
+        <Button onAction="#onSaveFlashcard"
+                text="Save Flashcard"
+                styleClass="primary-btn"
+                prefWidth="140" />
+    </HBox>
+
+    <!-- Success message -->
+    <Label fx:id="successLabel" />
+
+</VBox>

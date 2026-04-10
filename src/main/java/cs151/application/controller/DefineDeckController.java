@@ -31,8 +31,10 @@ public class DefineDeckController {
     @FXML
     private Label promptMsgLbl;
 
+    private final DeckDao deckDao = new DeckDao();
 
     /**
+     * Handles initialization once page loads.
      * Disables the Create Deck button until the text field is filled by the user.
      */
     public void initialize() {
@@ -40,14 +42,11 @@ public class DefineDeckController {
         descriptionField.setWrapText(true);
     }
 
-
-    private final DeckDao deckDao = new DeckDao();
-
     /**
      * The operation returns the user back to homepage.
      */
     @FXML
-    protected void onExitButtonClickOp(ActionEvent event) {
+    protected void goBackHomeOp(ActionEvent event) {
         try {
 
             FXMLLoader loader = new FXMLLoader(

@@ -16,7 +16,7 @@ public class DeckDao {
      * Represents a single row from Deck_table.
      * Record fields are accessed via id(), deckName(), description().
      */
-    public record Deck(int id, String deckName, String description) {}
+    public record Deck(int id, String deckName, String description, String creationDate, String lastVisited) {}
 
     /**
      * Grabs the shared database connection from DatabaseController.
@@ -54,7 +54,7 @@ public class DeckDao {
      * Returns an empty list if no decks exist.
      */
     public List<Deck> getAllDecks() throws SQLException {
-        String sql = "SELECT id, deck_name, description FROM Deck_table ORDER BY deck_name";
+        String sql = "SELECT id, deck_name, description, creation_date, last_visited FROM Deck_table ORDER BY deck_name";
         List<Deck> decks = new ArrayList<>();
         try (Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
@@ -62,7 +62,9 @@ public class DeckDao {
                 decks.add(new Deck(
                         rs.getInt("id"),
                         rs.getString("deck_name"),
-                        rs.getString("description")
+                        rs.getString("description"),
+                        rs.getString("creation_date"),
+                        rs.getString("last_visited")
                 ));
             }
         }
@@ -74,7 +76,7 @@ public class DeckDao {
      * Returns null if no deck with that name exists.
      */
     public Deck getDeckByName(String deckName) throws SQLException {
-        String sql = "SELECT id, deck_name, description FROM Deck_table WHERE deck_name = ?";
+        String sql = "SELECT id, deck_name, description, creation_date, last_visited FROM Deck_table WHERE deck_name = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, deckName);
             try (ResultSet rs = stmt.executeQuery()) {
@@ -82,7 +84,9 @@ public class DeckDao {
                     return new Deck(
                             rs.getInt("id"),
                             rs.getString("deck_name"),
-                            rs.getString("description")
+                            rs.getString("description"),
+                            rs.getString("creation_date"),
+                            rs.getString("last_visited")
                     );
                 }
             }
@@ -100,16 +104,38 @@ public class DeckDao {
      * all linked flashcards automatically update to the new name.
      */
     public void updateDeck(String oldDeckName, String newDeckName, String newDescription) throws SQLException {
-        String sql = "UPDATE Deck_table SET deck_name = ?, description = ? WHERE deck_name = ?";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        // Update the deck itself
+        String updateDeckSql = "UPDATE Deck_table SET deck_name = ?, description = ? WHERE deck_name = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(updateDeckSql)) {
             stmt.setString(1, newDeckName);
             stmt.setString(2, newDescription);
             stmt.setString(3, oldDeckName);
             stmt.executeUpdate();
             logger.info("Updated deck: {} → {}", oldDeckName, newDeckName);
         }
+
+        // Manually sync deck_name in all linked flashcards
+        String syncFlashcardsSql = "UPDATE Flashcard_table SET deck_name = ? WHERE deck_name = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(syncFlashcardsSql)) {
+            stmt.setString(1, newDeckName);
+            stmt.setString(2, oldDeckName);
+            stmt.executeUpdate();
+            logger.info("Synced deck_name in Flashcard_table: {} → {}", oldDeckName, newDeckName);
+        }
     }
 
+    /**
+     * Stamps last_visited with the current database time.
+     * Call this every time the user navigates into a deck to view its flashcards.
+     */
+    public void updateLastVisited(int deckId) throws SQLException {
+        String sql = "UPDATE Deck_table SET last_visited = datetime('now') WHERE id = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, deckId);
+            stmt.executeUpdate();
+            logger.info("Updated last_visited for deck id: {}", deckId);
+        }
+    }
     // ---------------------------------------------------------
     // DELETE
     // ---------------------------------------------------------

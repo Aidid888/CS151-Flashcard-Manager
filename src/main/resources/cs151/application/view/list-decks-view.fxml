@@ -6,10 +6,9 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="CENTER"
+<VBox alignment="TOP_CENTER"
       spacing="10"
       styleClass="root"
       stylesheets="@../../../css/styles.css"
@@ -21,21 +20,27 @@
         <Insets bottom="20" left="20" right="20" top="20" />
     </padding>
 
-   <ButtonBar prefHeight="40.0" prefWidth="200.0">
+    <!-- Back to Home button -->
+    <ButtonBar prefHeight="40.0" prefWidth="200.0">
      <buttons>
-         <Button onAction="#goBackHome" styleClass="back-btn" text="⌂ Back to Home" />
+         <Button onAction="#goBackHomeOp" styleClass="back-btn" text="⌂ Back to Home" />
      </buttons>
    </ButtonBar>
 
-    <Label style="-fx-font-size: 20px;" styleClass="title-label" text="All Decks" />
+    <!-- Title -->
+    <Label styleClass="title-label"
+           text="All Decks" />
 
+    <!-- TableView for list of Decks -->
     <TableView fx:id="deckTable" prefWidth="500">
-
         <columns>
-            <TableColumn fx:id="nameColumn" prefWidth="200" text="Deck Name" />
-            <TableColumn fx:id="descColumn" prefWidth="300" text="Description" />
+            <TableColumn fx:id="nameColumn"            prefWidth="150" text="Deck Name" />
+            <TableColumn fx:id="descColumn"            prefWidth="200" text="Description" />
+            <TableColumn fx:id="creationDateColumn"    prefWidth="130" text="Created" />
+            <TableColumn fx:id="lastVisitedColumn"     prefWidth="130" text="Last Visited" />
+            <TableColumn fx:id="totalFlashcardsInDeck" prefWidth="100" text="Num Flashcards" />
+            <TableColumn fx:id="actionsColumn"         prefWidth="80"  text="Actions" />
         </columns>
-
     </TableView>
 
 </VBox>
