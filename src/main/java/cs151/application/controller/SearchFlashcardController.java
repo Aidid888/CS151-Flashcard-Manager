@@ -76,17 +76,15 @@ public class SearchFlashcardController {
         tableData    = FXCollections.observableArrayList();
 
         // Simple string columns — property names match Flashcard record accessors
-        deckNameColumn    .setCellValueFactory(new PropertyValueFactory<>("deckName"));
-        statusColumn      .setCellValueFactory(new PropertyValueFactory<>("status"));
-        creationDateColumn.setCellValueFactory(new PropertyValueFactory<>("creationDate"));
-        lastViewedColumn  .setCellValueFactory(new PropertyValueFactory<>("lastViewed"));
+        deckNameColumn    .setCellValueFactory(cell -> new javafx.beans.property.SimpleStringProperty(cell.getValue().deckName()));
+        statusColumn      .setCellValueFactory(cell -> new javafx.beans.property.SimpleStringProperty(cell.getValue().status()));
+        creationDateColumn.setCellValueFactory(cell -> new javafx.beans.property.SimpleStringProperty(cell.getValue().creationDate()));
+        lastViewedColumn  .setCellValueFactory(cell -> new javafx.beans.property.SimpleStringProperty(
+                cell.getValue().lastViewed() == null ? "Never" : cell.getValue().lastViewed()));
 
         // TextArea columns: bind value then override rendering to show first line only
-        frontTextColumn.setCellValueFactory(new PropertyValueFactory<>("frontText"));
-        frontTextColumn.setCellFactory(col -> firstLineCell());
-
-        backTextColumn.setCellValueFactory(new PropertyValueFactory<>("backText"));
-        backTextColumn.setCellFactory(col -> firstLineCell());
+        frontTextColumn.setCellValueFactory(cell -> new javafx.beans.property.SimpleStringProperty(cell.getValue().frontText()));
+        backTextColumn .setCellValueFactory(cell -> new javafx.beans.property.SimpleStringProperty(cell.getValue().backText()));
 
         // Delete column has no data property — entirely driven by its cell factory
         deleteColumn.setCellFactory(buildDeleteCellFactory());

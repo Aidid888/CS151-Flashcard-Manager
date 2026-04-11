@@ -21,18 +21,15 @@ import java.util.Optional;
 
 public class ListDeckController {
 
-    @FXML
-    private TableView<Deck> deckTable;
-    @FXML
-    private TableColumn<Deck, String> nameColumn;
-    @FXML
-    private TableColumn<Deck, String> descColumn;
-    @FXML
-    private TableColumn<Deck, Void> actionsColumn;
-    @FXML
-    private TableColumn<Deck, Integer> totalFlashcardsInDeck;
+    @FXML private TableView<Deck>            deckTable;
+    @FXML private TableColumn<Deck, String>  nameColumn;
+    @FXML private TableColumn<Deck, String>  descColumn;
+    @FXML private TableColumn<Deck, String>  creationDateColumn;
+    @FXML private TableColumn<Deck, String>  lastVisitedColumn;
+    @FXML private TableColumn<Deck, Integer> totalFlashcardsInDeck;
+    @FXML private TableColumn<Deck, Void>    actionsColumn;
 
-    private final DeckDao deckDao = new DeckDao();
+    private final DeckDao      deckDao      = new DeckDao();
     private final FlashcardDao flashcardDao = new FlashcardDao();
     private final ObservableList<Deck> deckList = FXCollections.observableArrayList();
 
@@ -43,19 +40,20 @@ public class ListDeckController {
     public void initialize() {
         deckTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
 
-        nameColumn.setCellValueFactory(cellData ->
-                new javafx.beans.property.SimpleStringProperty(
-                        cellData.getValue().deckName()
-                )
-        );
+        nameColumn.setCellValueFactory(cell ->
+                new javafx.beans.property.SimpleStringProperty(cell.getValue().deckName()));
 
-        descColumn.setCellValueFactory(cellData ->
+        descColumn.setCellValueFactory(cell ->
                 new javafx.beans.property.SimpleStringProperty(
-                        cellData.getValue().description() == null
-                                ? ""
-                                : cellData.getValue().description()
-                )
-        );
+                        cell.getValue().description() == null ? "" : cell.getValue().description()));
+
+        creationDateColumn.setCellValueFactory(cell ->
+                new javafx.beans.property.SimpleStringProperty(
+                        cell.getValue().creationDate() == null ? "" : cell.getValue().creationDate()));
+
+        lastVisitedColumn.setCellValueFactory(cell ->
+                new javafx.beans.property.SimpleStringProperty(
+                        cell.getValue().lastVisited() == null ? "Never" : cell.getValue().lastVisited()));
 
         totalFlashcardsInDeck.setCellValueFactory(cell -> {
             try {
@@ -77,13 +75,9 @@ public class ListDeckController {
      */
     private void loadDecks() {
         try {
-            List<Deck> deckList = deckDao.getAllDecks();
-
-            ObservableList<Deck> observableList =
-                    FXCollections.observableArrayList(deckList);
-
-            deckTable.setItems(observableList);
-
+            List<Deck> decks = deckDao.getAllDecks();
+            deckList.setAll(decks);
+            deckTable.setItems(deckList);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -97,15 +91,9 @@ public class ListDeckController {
         try {
             FXMLLoader loader = new FXMLLoader(
                     Main.class.getResource("view/home-view.fxml"));
-
-            Scene scene = new Scene(loader.load(), 600, 500);
-
-            Stage stage = (Stage)((Node)event.getSource())
-                    .getScene().getWindow();
-
-            stage.setScene(scene);
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setScene(new Scene(loader.load(), 600, 500));
             stage.show();
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -117,9 +105,11 @@ public class ListDeckController {
 
     private void handleSeeAllFlashcards(Deck deck) {
         try {
+            // Stamp last visited when user navigates into a deck
+            deckDao.updateLastVisited(deck.id());
+
             FXMLLoader loader = new FXMLLoader(
                     Main.class.getResource("view/list-flashcards-view.fxml"));
-
             Stage stage = (Stage) deckTable.getScene().getWindow();
             stage.setScene(new Scene(loader.load()));
 
@@ -127,11 +117,13 @@ public class ListDeckController {
             if (controller instanceof ListFlashcardController lfc) {
                 lfc.setDeck(deck);
             }
-
             stage.show();
         } catch (IOException e) {
             showAlert(Alert.AlertType.ERROR, "Navigation Error",
-                    "Could not open Add Flashcard view:\n" + e.getMessage());
+                    "Could not open Flashcard view:\n" + e.getMessage());
+        } catch (SQLException e) {
+            showAlert(Alert.AlertType.ERROR, "Database Error",
+                    "Could not update last visited:\n" + e.getMessage());
         }
     }
 
@@ -150,7 +142,7 @@ public class ListDeckController {
         dialog.setHeaderText("Edit \"" + deck.deckName() + "\"");
 
         javafx.scene.layout.VBox content = new javafx.scene.layout.VBox(8,
-                new Label("Name:"),        nameField,
+                new Label("Name:"), nameField,
                 new Label("Description:"), descField);
         content.setPadding(new javafx.geometry.Insets(10));
         dialog.getDialogPane().setContent(content);
@@ -169,7 +161,8 @@ public class ListDeckController {
             deckDao.updateDeck(deck.deckName(), newName, descField.getText().trim());
             loadDecks();
         } catch (SQLException e) {
-            showAlert(Alert.AlertType.ERROR, "Database Error", "Could not update deck:\n" + e.getMessage());
+            showAlert(Alert.AlertType.ERROR, "Database Error",
+                    "Could not update deck:\n" + e.getMessage());
         }
     }
 
@@ -187,7 +180,8 @@ public class ListDeckController {
             deckDao.deleteDeck(deck.deckName());
             loadDecks();
         } catch (SQLException e) {
-            showAlert(Alert.AlertType.ERROR, "Database Error", "Could not delete deck:\n" + e.getMessage());
+            showAlert(Alert.AlertType.ERROR, "Database Error",
+                    "Could not delete deck:\n" + e.getMessage());
         }
     }
 
@@ -210,12 +204,13 @@ public class ListDeckController {
 
     /**
      * Renders a trigger button for actions on every non-empty row.
-     * Kept as a private inner class so it can call the outer controller's handler methods directly — no extra coupling needed.
+     * Kept as a private inner class so it can call the outer controller's
+     * handler methods directly — no extra coupling needed.
      */
     private class ActionCell extends TableCell<Deck, Void> {
 
-        private final Button menuBtn = new Button("⋮");
-        private final ContextMenu menu = new ContextMenu();
+        private final Button      menuBtn = new Button("⋮");
+        private final ContextMenu menu    = new ContextMenu();
 
         ActionCell() {
             MenuItem addItem    = new MenuItem("See All Flashcards");
@@ -227,7 +222,6 @@ public class ListDeckController {
             deleteItem.setOnAction(e -> handleDeleteDeck(getTableRow().getItem()));
 
             menu.getItems().addAll(addItem, updateItem, deleteItem);
-
             menuBtn.setOnAction(e ->
                     menu.show(menuBtn, javafx.geometry.Side.BOTTOM, 0, 0));
         }

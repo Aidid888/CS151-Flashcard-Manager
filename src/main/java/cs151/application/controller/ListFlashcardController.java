@@ -31,6 +31,7 @@ public class ListFlashcardController {
     @FXML private TableColumn<Flashcard, String> statusColumn;
     @FXML private TableColumn<Flashcard, String> creationDateColumn;
     @FXML private TableColumn<Flashcard, String> lastViewedColumn;
+    @FXML private TableColumn<Flashcard, Void> deleteColumn;
 
     private final DeckDao      deckDao      = new DeckDao();
     private final FlashcardDao flashcardDao = new FlashcardDao();
@@ -61,6 +62,33 @@ public class ListFlashcardController {
                         cell.getValue().lastViewed() == null
                                 ? "Never"
                                 : cell.getValue().lastViewed()));
+        deleteColumn.setCellFactory(col -> new TableCell<>() {
+            private final Button deleteBtn = new Button("Delete");
+            {
+                deleteBtn.setStyle("-fx-background-color: #c0392b; -fx-text-fill: white;");
+                deleteBtn.setOnAction(e -> {
+                    Flashcard card = getTableView().getItems().get(getIndex());
+                    Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+                    confirm.setTitle("Confirm Deletion");
+                    confirm.setHeaderText("Delete this flashcard?");
+                    confirm.setContentText("\"" + card.frontText().split("\\R", 2)[0] + "\" will be permanently removed.");
+                    confirm.showAndWait().filter(btn -> btn == ButtonType.OK).ifPresent(btn -> {
+                        try {
+                            flashcardDao.deleteFlashcard(card.id());
+                            flashcardList.remove(card);
+                        } catch (SQLException ex) {
+                            showAlert("Database Error", "Could not delete flashcard:\n" + ex.getMessage());
+                        }
+                    });
+                });
+            }
+
+            @Override
+            protected void updateItem(Void item, boolean empty) {
+                super.updateItem(item, empty);
+                setGraphic(empty ? null : deleteBtn);
+            }
+        });
 
         flashcardTable.setItems(flashcardList);
 
