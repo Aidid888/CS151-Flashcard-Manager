@@ -5,8 +5,8 @@
 
 ### Version: 0.6
 1. Aiden Tat: 
-2. Andrew Song: 
-3. Katherine Shih: Search Flashcard Page
+2. Andrew Song: Developed global search and delete flashcard
+3. Katherine Shih: Designed Search Flashcard Page, Fixed database
 
 ### Version: 0.5
 1. Aiden Tat: Added FlashcardDAO

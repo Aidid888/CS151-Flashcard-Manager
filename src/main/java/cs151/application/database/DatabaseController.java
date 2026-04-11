@@ -107,6 +107,9 @@ public class DatabaseController {
             try { stmt.execute("ALTER TABLE Deck_table ADD COLUMN creation_date TEXT NOT NULL DEFAULT (datetime('now'))"); } catch (SQLException ignored) {}
             try { stmt.execute("ALTER TABLE Deck_table ADD COLUMN last_visited TEXT"); } catch (SQLException ignored) {}
 
+            // Migrate Flashcard_table
+            try { stmt.execute("ALTER TABLE Flashcard_table ADD COLUMN creation_date TEXT DEFAULT (datetime('now'))"); } catch (SQLException ignored) {}
+            try { stmt.execute("ALTER TABLE Flashcard_table ADD COLUMN last_viewed TEXT"); } catch (SQLException ignored) {}
         } catch (SQLException e) {
             logger.error("Failed to create tables: {}", e.getMessage(), e);
             throw new RuntimeException("Table creation failed.", e);
