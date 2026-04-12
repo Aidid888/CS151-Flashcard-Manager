@@ -80,3 +80,19 @@
 
 .primary-btn {
 }
+
+.deck-description {
+    -fx-background-color: #f5f5f5;
+    -fx-background-radius: 4;
+    -fx-border-color: #e0e0e0;
+    -fx-border-radius: 4;
+    -fx-border-width: 1;
+    -fx-padding: 6 10 6 10;
+    -fx-font-size: 13px;
+}
+
+/* Style the Text node inside */
+.deck-description .text {
+    -fx-fill: #555555;
+    -fx-font-size: 13px;
+}

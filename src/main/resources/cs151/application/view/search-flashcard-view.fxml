@@ -11,7 +11,8 @@
       xmlns="http://javafx.com/javafx/23"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="cs151.application.controller.SearchFlashcardController"
-      prefHeight="500.0" prefWidth="700.0">
+      prefHeight="500.0" prefWidth="700.0"
+      maxHeight="Infinity" maxWidth="Infinity">
 
     <padding>
         <Insets bottom="20" left="20" right="20" top="20" />
@@ -31,23 +32,32 @@
 
     <Label text="Search is case-insensitive. Matches Deck Name, Front Text, Back Text, and Status." />
 
-    <!-- Live search field — fx:id wires it to the controller -->
-    <HBox alignment="CENTER_LEFT" spacing="10">
+    <!-- Live search field -->
+    <HBox alignment="CENTER_LEFT" spacing="10" maxWidth="Infinity">
         <TextField fx:id="searchField"
                    promptText="Type to search…"
                    HBox.hgrow="ALWAYS" />
     </HBox>
 
     <!-- Results table -->
-    <TableView fx:id="flashcardTable" VBox.vgrow="ALWAYS">
+    <TableView fx:id="flashcardTable"
+               VBox.vgrow="ALWAYS"
+               maxWidth="Infinity">
+        <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+        </columnResizePolicy>
         <columns>
             <TableColumn fx:id="deckNameColumn"     prefWidth="130" text="Deck" />
             <TableColumn fx:id="frontTextColumn"    prefWidth="175" text="Front Text" />
             <TableColumn fx:id="backTextColumn"     prefWidth="175" text="Back Text" />
-            <TableColumn fx:id="statusColumn"       prefWidth="90"  text="Status" />
+            <TableColumn fx:id="statusColumn"
+                         minWidth="90" maxWidth="90"
+                         text="Status" />
             <TableColumn fx:id="creationDateColumn" prefWidth="130" text="Created" />
             <TableColumn fx:id="lastViewedColumn"   prefWidth="130" text="Last Reviewed" />
-            <TableColumn fx:id="deleteColumn"       prefWidth="80"  text="Action" />
+            <TableColumn fx:id="deleteColumn"
+                         minWidth="80" maxWidth="80"
+                         text="Action" />
         </columns>
     </TableView>
 

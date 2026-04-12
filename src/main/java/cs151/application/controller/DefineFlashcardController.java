@@ -8,6 +8,8 @@ import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.text.Text;
+import javafx.scene.layout.VBox;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -30,6 +32,9 @@ public class DefineFlashcardController {
     @FXML private Label statusErrorLabel;
     @FXML private Label successLabel;
 
+    @FXML private VBox  deckDescriptionBox;
+    @FXML private Text deckDescriptionText;
+
     // ── DAOs ──────────────────────────────────────────────────────
     private final DeckDao      deckDao      = new DeckDao();
     private final FlashcardDao flashcardDao = new FlashcardDao();
@@ -47,6 +52,19 @@ public class DefineFlashcardController {
         statusComboBox.setItems(FXCollections.observableArrayList(
                 "New", "Learning", "Mastered"));
         statusComboBox.getSelectionModel().selectFirst();
+
+        // Show deck description whenever the selection changes
+        deckComboBox.valueProperty().addListener((obs, oldDeck, newDeck) -> {
+            if (newDeck == null || newDeck.description() == null
+                    || newDeck.description().isBlank()) {
+                deckDescriptionBox.setVisible(false);
+                deckDescriptionBox.setManaged(false);
+            } else {
+                deckDescriptionText.setText(newDeck.description()); // ✅ was deckDescriptionLabel
+                deckDescriptionBox.setVisible(true);
+                deckDescriptionBox.setManaged(true);
+            }
+        });
     }
 
     /**

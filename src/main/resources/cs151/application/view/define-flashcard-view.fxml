@@ -3,6 +3,8 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.TextFlow?>
+<?import javafx.scene.text.Text?>
 
 <VBox alignment="TOP_CENTER"
       spacing="16"
@@ -26,10 +28,13 @@
     </ButtonBar>
 
     <!-- Title -->
-    <Label text="Add Flashcard" styleClass="title-label"/>
+    <Label text="Add Flashcard" styleClass="title-label" />
 
-    <!-- Form card -->
-    <VBox id="form-card" maxWidth="620">
+    <!-- Form card — grows to fill available vertical space -->
+    <VBox id="form-card"
+          VBox.vgrow="ALWAYS"
+          fillWidth="true"
+          maxWidth="Infinity">
         <padding>
             <Insets bottom="20" left="20" right="20" top="20" />
         </padding>
@@ -38,23 +43,37 @@
         <Label styleClass="field-labels" text="Deck *" />
         <ComboBox fx:id="deckComboBox"
                   promptText="Select a deck…"
-                  prefWidth="300" />
+                  maxWidth="Infinity" />
         <Label fx:id="deckErrorLabel" styleClass="error-labels" />
 
-        <!-- Front Text -->
+        <!-- Deck description — hidden until a deck is selected -->
+        <VBox fx:id="deckDescriptionBox"
+              spacing="4"
+              managed="false"
+              visible="false"
+              fillWidth="true">
+            <Label styleClass="field-labels-sub" text="Description" />
+            <TextFlow styleClass="deck-description" maxWidth="Infinity">
+                <Text fx:id="deckDescriptionText" />
+            </TextFlow>
+        </VBox>
+
+        <!-- Front Text — expands and contracts with window height -->
         <Label styleClass="field-labels" text="Front Text *" />
         <TextArea fx:id="frontTextArea"
                   promptText="Enter the question or term…"
-                  prefHeight="100"
-                  wrapText="true" />
+                  wrapText="true"
+                  minHeight="60"
+                  VBox.vgrow="ALWAYS" />
         <Label fx:id="frontErrorLabel" styleClass="error-labels" />
 
-        <!-- Back Text -->
+        <!-- Back Text — expands and contracts with window height -->
         <Label styleClass="field-labels" text="Back Text *" />
         <TextArea fx:id="backTextArea"
                   promptText="Enter the answer or definition…"
-                  prefHeight="100"
-                  wrapText="true" />
+                  wrapText="true"
+                  minHeight="60"
+                  VBox.vgrow="ALWAYS" />
         <Label fx:id="backErrorLabel" styleClass="error-labels" />
 
         <!-- Status -->
@@ -67,7 +86,7 @@
     </VBox>
 
     <!-- Action buttons -->
-    <HBox spacing="10" alignment="CENTER_RIGHT" maxWidth="620">
+    <HBox spacing="10" alignment="CENTER_RIGHT" maxWidth="Infinity">
         <Button onAction="#onClearFields"
                 text="Clear"
                 prefWidth="90" />
