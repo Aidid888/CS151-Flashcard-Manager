@@ -36,7 +36,7 @@ public class MainController {
             FXMLLoader loader = new FXMLLoader(
                     Main.class.getResource("view/define-deck-view.fxml"));
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(loader.load(), 600, 400));
+            stage.setScene(new Scene(loader.load(), 600, 500));
             stage.show();
         } catch (Exception e) {
             e.printStackTrace();
@@ -52,7 +52,7 @@ public class MainController {
             FXMLLoader loader = new FXMLLoader(
                     Main.class.getResource("view/define-flashcard-view.fxml"));
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(loader.load(), 600, 500));
+            stage.setScene(new Scene(loader.load(), 600, 600));
             stage.show();
         } catch (Exception e) {
             e.printStackTrace();

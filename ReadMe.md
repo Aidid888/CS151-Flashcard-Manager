@@ -4,7 +4,7 @@
 ## Who did what:
 
 ### Version: 0.6
-1. Aiden Tat: Modified DefineFlashcard Page + Search Page
+1. Aiden Tat: Modified DefineFlashcard Page and Search Flashcard Page
 2. Andrew Song: Developed global search and delete flashcard
 3. Katherine Shih: Designed Search Flashcard Page, Fixed database
 
