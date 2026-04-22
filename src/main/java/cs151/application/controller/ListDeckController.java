@@ -32,7 +32,7 @@ public class ListDeckController {
     private final DeckDao      deckDao      = new DeckDao();
     private final FlashcardDao flashcardDao = new FlashcardDao();
     private final ObservableList<Deck> deckList = FXCollections.observableArrayList();
-
+    private final java.util.Map<Integer, Integer> flashcardCounts = new java.util.HashMap<>();
     /**
      * Initializes TableView and list of Decks when the page loads.
      */
@@ -55,14 +55,11 @@ public class ListDeckController {
                 new javafx.beans.property.SimpleStringProperty(
                         cell.getValue().lastVisited() == null ? "Never" : cell.getValue().lastVisited()));
 
-        totalFlashcardsInDeck.setCellValueFactory(cell -> {
-            try {
-                int count = flashcardDao.getFlashcardCountByDeckId(cell.getValue().id());
-                return new javafx.beans.property.SimpleObjectProperty<>(count);
-            } catch (SQLException e) {
-                return new javafx.beans.property.SimpleObjectProperty<>(0);
-            }
-        });
+        totalFlashcardsInDeck.setCellValueFactory(cell ->
+                new javafx.beans.property.SimpleObjectProperty<>(
+                        flashcardCounts.getOrDefault(cell.getValue().id(), 0)
+                )
+        );
 
         actionsColumn.setCellFactory(col -> new ActionCell());
 
@@ -76,6 +73,10 @@ public class ListDeckController {
     private void loadDecks() {
         try {
             List<Deck> decks = deckDao.getAllDecks();
+            flashcardCounts.clear();
+            for (Deck d : decks) {
+                flashcardCounts.put(d.id(), flashcardDao.getFlashcardCountByDeckId(d.id()));
+            }
             deckList.setAll(decks);
             deckTable.setItems(deckList);
         } catch (Exception e) {
@@ -111,7 +112,7 @@ public class ListDeckController {
             FXMLLoader loader = new FXMLLoader(
                     Main.class.getResource("view/list-flashcards-view.fxml"));
             Stage stage = (Stage) deckTable.getScene().getWindow();
-            stage.setScene(new Scene(loader.load()));
+            stage.setScene(new Scene(loader.load(), 600, 500));
 
             Object controller = loader.getController();
             if (controller instanceof ListFlashcardController lfc) {

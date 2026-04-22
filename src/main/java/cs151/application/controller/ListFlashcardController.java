@@ -152,10 +152,7 @@ public class ListFlashcardController {
 
     private void loadAllFlashcards() {
         try {
-            List<Flashcard> all = new ArrayList<>();
-            for (Deck deck : deckDao.getAllDecks()) {
-                all.addAll(flashcardDao.getFlashcardsByDeckId(deck.id()));
-            }
+            List<Flashcard> all = flashcardDao.searchFlashcards("");
             all.sort((a, b) -> b.creationDate().compareTo(a.creationDate()));
             flashcardList.setAll(all);
         } catch (SQLException e) {

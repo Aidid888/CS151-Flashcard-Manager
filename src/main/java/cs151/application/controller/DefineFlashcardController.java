@@ -94,21 +94,13 @@ public class DefineFlashcardController {
         String status     = statusComboBox.getValue();
 
         try {
-            // Uniqueness check: front text must be unique within the selected deck
-            List<FlashcardDao.Flashcard> existing =
-                    flashcardDao.getFlashcardsByDeckId(selectedDeck.id());
-
-            boolean duplicate = existing.stream()
-                    .anyMatch(fc -> fc.frontText().equalsIgnoreCase(frontText));
-
-            if (duplicate) {
-                frontErrorLabel.setText(
-                        "A flashcard with this front text already exists in this deck.");
+            if (flashcardDao.existsByFrontText(selectedDeck.id(), frontText)) {
+                frontErrorLabel.setText("A flashcard with this front text already exists in this deck.");
                 return;
             }
 
             flashcardDao.insertFlashcard(
-                    selectedDeck.id(), selectedDeck.deckName(),
+                    selectedDeck.id(),
                     frontText, backText, status);
 
             clearFields();
@@ -196,6 +188,8 @@ public class DefineFlashcardController {
         frontErrorLabel.setText("");
         backErrorLabel.setText("");
         statusErrorLabel.setText("");
+        deckDescriptionBox.setVisible(false);
+        deckDescriptionBox.setManaged(false);
     }
 
     private void showAlert(String title, String message) {
