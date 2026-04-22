@@ -1,26 +1,68 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
 <VBox xmlns:fx="http://javafx.com/fxml"
       fx:controller="cs151.application.controller.EditFlashcardController"
-      spacing="12" style="-fx-padding: 20;">
+      spacing="10"
+      prefWidth="480"
+      style="-fx-padding: 20; -fx-background-color: #f9f9f9;">
 
-    <Label text="Front Text:" />
-    <TextArea fx:id="frontTextArea" wrapText="true" prefRowCount="4"/>
+    <Label text="Edit Flashcard" style="-fx-font-size: 16px; -fx-font-weight: bold;"/>
 
-    <Label text="Back Text:" />
-    <TextArea fx:id="backTextArea" wrapText="true" prefRowCount="4"/>
+    <!-- DECK (read-only) -->
+    <Label text="Deck"/>
+    <TextField fx:id="deckField"
+               editable="false"
+               mouseTransparent="true"
+               focusTraversable="false"
+               style="-fx-background-color: #e8e8e8; -fx-text-fill: #555555;"/>
 
-    <Label text="Status:" />
-    <ComboBox fx:id="statusComboBox" />
+    <!-- FRONT TEXT (editable) -->
+    <Label text="Front Text"/>
+    <TextArea fx:id="frontTextArea"
+              wrapText="true"
+              prefRowCount="3"/>
 
+    <!-- BACK TEXT (editable) -->
+    <Label text="Back Text"/>
+    <TextArea fx:id="backTextArea"
+              wrapText="true"
+              prefRowCount="3"/>
+
+    <!-- STATUS (editable) -->
+    <Label text="Status"/>
+    <ComboBox fx:id="statusComboBox" maxWidth="Infinity"/>
+
+    <!-- CREATION DATE (read-only) -->
+    <Label text="Creation Date"/>
+    <TextField fx:id="creationDateField"
+               editable="false"
+               mouseTransparent="true"
+               focusTraversable="false"
+               style="-fx-background-color: #e8e8e8; -fx-text-fill: #555555;"/>
+
+    <!-- LAST REVIEW DATE (read-only) -->
+    <Label text="Last Review Date"/>
+    <TextField fx:id="lastReviewedField"
+               editable="false"
+               mouseTransparent="true"
+               focusTraversable="false"
+               style="-fx-background-color: #e8e8e8; -fx-text-fill: #555555;"/>
+
+    <!-- BUTTONS -->
     <HBox spacing="10" alignment="CENTER_RIGHT">
-        <Button text="Cancel" onAction="#onCancel"/>
-        <Button text="Save" onAction="#onSave"/>
+        <VBox.margin>
+            <Insets top="10"/>
+        </VBox.margin>
+        <Button text="Cancel" onAction="#onCancel" prefWidth="80"/>
+        <Button text="Save"
+                onAction="#onSave"
+                prefWidth="80"
+                style="-fx-background-color: #2a7ae2; -fx-text-fill: white;"/>
     </HBox>
+
 </VBox>

@@ -193,7 +193,7 @@ public class ListFlashcardController {
             Stage popupStage = new Stage();
             popupStage.initModality(Modality.APPLICATION_MODAL); // blocks parent window
             popupStage.setTitle("Edit Flashcard");
-            popupStage.setScene(new Scene(loader.load(), 450, 350));
+            popupStage.setScene(new Scene(loader.load(), 450, 600));
 
             EditFlashcardController editController = loader.getController();
             editController.setFlashcard(card);
