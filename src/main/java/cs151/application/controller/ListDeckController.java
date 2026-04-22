@@ -39,6 +39,15 @@ public class ListDeckController {
     @FXML
     public void initialize() {
         deckTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
+        deckTable.setRowFactory(tv -> {
+            TableRow<Deck> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && !row.isEmpty()) {
+                    handleUpdateDeck(row.getItem());
+                }
+            });
+            return row;
+        });
 
         nameColumn.setCellValueFactory(cell ->
                 new javafx.beans.property.SimpleStringProperty(cell.getValue().deckName()));

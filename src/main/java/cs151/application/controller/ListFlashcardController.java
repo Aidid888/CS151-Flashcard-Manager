@@ -14,6 +14,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -91,6 +92,15 @@ public class ListFlashcardController {
         });
 
         flashcardTable.setItems(flashcardList);
+        flashcardTable.setRowFactory(tv -> {
+            TableRow<Flashcard> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && !row.isEmpty()) {
+                    openEditPopup(row.getItem());
+                }
+            });
+            return row;
+        });
 
         // Show deck names in the ComboBox
         deckComboBox.setCellFactory(lv -> new DeckCell());
@@ -173,6 +183,30 @@ public class ListFlashcardController {
             stage.show();
         } catch (IOException e) {
             showAlert("Navigation Error", "Could not return home:\n" + e.getMessage());
+        }
+    }
+
+    private void openEditPopup(Flashcard card) {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    Main.class.getResource("view/edit-flashcard-view.fxml"));
+            Stage popupStage = new Stage();
+            popupStage.initModality(Modality.APPLICATION_MODAL); // blocks parent window
+            popupStage.setTitle("Edit Flashcard");
+            popupStage.setScene(new Scene(loader.load(), 450, 350));
+
+            EditFlashcardController editController = loader.getController();
+            editController.setFlashcard(card);
+            editController.setOnSaved(() -> {
+                // Refresh the table after saving
+                Deck selected = (Deck) deckComboBox.getSelectionModel().getSelectedItem();
+                if (selected != null) loadFlashcardsForDeck(selected);
+                else loadAllFlashcards();
+            });
+
+            popupStage.showAndWait();
+        } catch (IOException e) {
+            showAlert("Navigation Error", "Could not open edit window:\n" + e.getMessage());
         }
     }
 
