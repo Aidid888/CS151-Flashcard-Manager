@@ -5,6 +5,7 @@ import cs151.application.database.DeckDao;
 import cs151.application.database.DeckDao.Deck;
 import cs151.application.database.FlashcardDao;
 import cs151.application.database.FlashcardDao.Flashcard;
+import cs151.application.util.AlertHelper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -82,7 +83,7 @@ public class ListFlashcardController {
                             flashcardDao.deleteFlashcard(card.id());
                             flashcardList.remove(card);
                         } catch (SQLException ex) {
-                            showAlert("Database Error", "Could not delete flashcard:\n" + ex.getMessage());
+                            AlertHelper.showAlert(Alert.AlertType.ERROR, "Database Error", "Could not delete flashcard:\n" + ex.getMessage());
                         }
                     });
                 });
@@ -154,7 +155,7 @@ public class ListFlashcardController {
             deckComboBox.setItems(
                     FXCollections.observableArrayList(deckDao.getAllDecks()));
         } catch (SQLException e) {
-            showAlert("Database Error", "Could not load decks:\n" + e.getMessage());
+            AlertHelper.showAlert(Alert.AlertType.ERROR, "Database Error", "Could not load decks:\n" + e.getMessage());
         }
     }
 
@@ -172,7 +173,7 @@ public class ListFlashcardController {
             cards.sort((a, b) -> b.creationDate().compareTo(a.creationDate()));
             flashcardList.setAll(cards);
         } catch (SQLException e) {
-            showAlert("Database Error", "Could not load flashcards:\n" + e.getMessage());
+            AlertHelper.showAlert(Alert.AlertType.ERROR, "Database Error", "Could not load flashcards:\n" + e.getMessage());
         }
     }
 
@@ -186,7 +187,7 @@ public class ListFlashcardController {
             all.sort((a, b) -> b.creationDate().compareTo(a.creationDate()));
             flashcardList.setAll(all);
         } catch (SQLException e) {
-            showAlert("Database Error", "Could not load flashcards:\n" + e.getMessage());
+            AlertHelper.showAlert(Alert.AlertType.ERROR, "Database Error", "Could not load flashcards:\n" + e.getMessage());
         }
     }
 
@@ -204,7 +205,7 @@ public class ListFlashcardController {
             stage.setScene(new Scene(loader.load(), 700, 600));
             stage.show();
         } catch (IOException e) {
-            showAlert("Navigation Error", "Could not return home:\n" + e.getMessage());
+            AlertHelper.showAlert(Alert.AlertType.ERROR, "Navigation Error", "Could not return home:\n" + e.getMessage());
         }
     }
 
@@ -234,22 +235,10 @@ public class ListFlashcardController {
 
             popupStage.showAndWait();
         } catch (IOException e) {
-            showAlert("Navigation Error", "Could not open edit window:\n" + e.getMessage());
+            AlertHelper.showAlert(Alert.AlertType.ERROR, "Navigation Error", "Could not open edit window:\n" + e.getMessage());
         }
     }
 
-    /**
-     * Helper method that displays modal error alert with the given title and message.
-     *
-     *  @param title   the alert window title
-     *  @param message the error message to display
-     *  */
-    private void showAlert(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR, message, ButtonType.OK);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.showAndWait();
-    }
 
     /**
      * Custom ListCell that renders a Deck by its name in the ComboBox instead of the default Object.toString() output.

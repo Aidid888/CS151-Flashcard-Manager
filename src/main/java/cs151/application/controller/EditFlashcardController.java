@@ -2,6 +2,7 @@ package cs151.application.controller;
 
 import cs151.application.database.FlashcardDao;
 import cs151.application.database.FlashcardDao.Flashcard;
+import cs151.application.util.AlertHelper;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -88,7 +89,7 @@ public class EditFlashcardController {
 
         // Basic validation
         if (front.isEmpty() || back.isEmpty() || status == null) {
-            showAlert("Validation Error", "Front text, back text, and status are required.");
+            AlertHelper.showAlert(Alert.AlertType.ERROR, "Validation Error", "Front text, back text, and status are required.");
             return;
         }
 
@@ -97,7 +98,7 @@ public class EditFlashcardController {
             if (onSaved != null) onSaved.run();
             closeWindow();
         } catch (SQLException e) {
-            showAlert("Database Error", "Could not save flashcard:\n" + e.getMessage());
+            AlertHelper.showAlert(Alert.AlertType.ERROR, "Database Error", "Could not save flashcard:\n" + e.getMessage());
         }
     }
 
@@ -116,16 +117,4 @@ public class EditFlashcardController {
         ((Stage) frontTextArea.getScene().getWindow()).close();
     }
 
-    /**
-     * Displays a modal error alert dialog to the user.
-     *
-     * @param title   the title text of the alert window
-     * @param message the error message displayed in the alert body
-     */
-    private void showAlert(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR, message, ButtonType.OK);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.showAndWait();
-    }
 }

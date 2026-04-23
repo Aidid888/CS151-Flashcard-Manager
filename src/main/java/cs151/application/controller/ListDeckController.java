@@ -4,6 +4,7 @@ import cs151.application.Main;
 import cs151.application.database.DeckDao;
 import cs151.application.database.DeckDao.Deck;
 import cs151.application.database.FlashcardDao;
+import cs151.application.util.AlertHelper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -136,7 +137,7 @@ public class ListDeckController {
             FXMLLoader loader = new FXMLLoader(
                     Main.class.getResource("view/list-flashcards-view.fxml"));
             Stage stage = (Stage) deckTable.getScene().getWindow();
-            stage.setScene(new Scene(loader.load(), 600, 500));
+            stage.setScene(new Scene(loader.load(), 700, 600));
 
             Object controller = loader.getController();
             if (controller instanceof ListFlashcardController lfc) {
@@ -144,10 +145,10 @@ public class ListDeckController {
             }
             stage.show();
         } catch (IOException e) {
-            showAlert(Alert.AlertType.ERROR, "Navigation Error",
+            AlertHelper.showAlert(Alert.AlertType.ERROR, "Navigation Error",
                     "Could not open Flashcard view:\n" + e.getMessage());
         } catch (SQLException e) {
-            showAlert(Alert.AlertType.ERROR, "Database Error",
+            AlertHelper.showAlert(Alert.AlertType.ERROR, "Database Error",
                     "Could not update last visited:\n" + e.getMessage());
         }
     }
@@ -184,7 +185,7 @@ public class ListDeckController {
 
         String newName = nameField.getText().trim();
         if (newName.isEmpty()) {
-            showAlert(Alert.AlertType.WARNING, "Validation", "Deck name cannot be empty.");
+            AlertHelper.showAlert(Alert.AlertType.WARNING, "Validation", "Deck name cannot be empty.");
             return;
         }
 
@@ -192,7 +193,7 @@ public class ListDeckController {
             deckDao.updateDeck(deck.deckName(), newName, descField.getText().trim());
             loadDecks();
         } catch (SQLException e) {
-            showAlert(Alert.AlertType.ERROR, "Database Error",
+            AlertHelper.showAlert(Alert.AlertType.ERROR, "Database Error",
                     "Could not update deck:\n" + e.getMessage());
         }
     }
@@ -217,23 +218,9 @@ public class ListDeckController {
             deckDao.deleteDeck(deck.deckName());
             loadDecks();
         } catch (SQLException e) {
-            showAlert(Alert.AlertType.ERROR, "Database Error",
+            AlertHelper.showAlert(Alert.AlertType.ERROR, "Database Error",
                     "Could not delete deck:\n" + e.getMessage());
         }
-    }
-
-    /**
-     * Helper method that displays a popup dialog to the user.
-     *
-     * @param type    the type of alert (e.g., ERROR, WARNING, INFORMATION)
-     * @param title   the title text of the alert window
-     * @param message the body message displayed in the alert
-     */
-    private void showAlert(Alert.AlertType type, String title, String message) {
-        Alert alert = new Alert(type, message, ButtonType.OK);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.showAndWait();
     }
 
     // ---------------------------------------------------------------

@@ -4,6 +4,7 @@ import cs151.application.Main;
 import cs151.application.database.DeckDao;
 import cs151.application.database.DeckDao.Deck;
 import cs151.application.database.FlashcardDao;
+import cs151.application.util.AlertHelper;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -119,7 +120,7 @@ public class DefineFlashcardController {
             successLabel.setText("✓ Flashcard saved successfully!");
 
         } catch (SQLException e) {
-            showAlert("Database Error", "Could not save flashcard:\n" + e.getMessage());
+            AlertHelper.showAlert(Alert.AlertType.ERROR, "Database Error", "Could not save flashcard:\n" + e.getMessage());
         }
     }
 
@@ -158,7 +159,7 @@ public class DefineFlashcardController {
             deckComboBox.setItems(
                     FXCollections.observableArrayList(deckDao.getAllDecks()));
         } catch (SQLException e) {
-            showAlert("Database Error", "Could not load decks:\n" + e.getMessage());
+            AlertHelper.showAlert(Alert.AlertType.ERROR, "Database Error", "Could not load decks:\n" + e.getMessage());
         }
     }
 
@@ -213,19 +214,6 @@ public class DefineFlashcardController {
         statusErrorLabel.setText("");
         deckDescriptionBox.setVisible(false);
         deckDescriptionBox.setManaged(false);
-    }
-
-    /**
-     * Displays a modal error alert dialog to the user.
-     *
-     * @param title the title text of the alert window
-     * @param message the error message displayed in the alert body
-     */
-    private void showAlert(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR, message, ButtonType.OK);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.showAndWait();
     }
 
     /**

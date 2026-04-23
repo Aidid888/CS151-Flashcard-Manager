@@ -4,9 +4,9 @@
 ## Who did what:
 
 ### Version: 0.7
-1. Aiden Tat: Modified selection feature, Fixed database 
+1. Aiden Tat: Modified edit feature, Fixed database 
 2. Andrew Song: 
-3. Katherine Shih: Modified window sizing
+3. Katherine Shih: Modified window, Developed alert class, fixed documentation
 
 ### Version: 0.6
 1. Aiden Tat: Modified DefineFlashcard Page and Search Flashcard Page

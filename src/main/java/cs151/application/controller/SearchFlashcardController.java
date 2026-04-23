@@ -3,6 +3,7 @@ package cs151.application.controller;
 import cs151.application.Main;
 import cs151.application.database.FlashcardDao;
 import cs151.application.database.FlashcardDao.Flashcard;
+import cs151.application.util.AlertHelper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -163,7 +164,7 @@ public class SearchFlashcardController {
                             tableData.remove(card); // instant UI update, no re-query
                         } catch (SQLException ex) {
                             ex.printStackTrace();
-                            showError("Delete failed: " + ex.getMessage());
+                            AlertHelper.showAlert(Alert.AlertType.ERROR, "Delete failed: ", "Could not delete flashcard:\n" + ex.getMessage());
                         }
                     }
                 });
@@ -194,21 +195,6 @@ public class SearchFlashcardController {
         return alert.showAndWait()
                 .filter(btn -> btn == ButtonType.OK)
                 .isPresent();
-    }
-
-    /**
-     * Displays an error alert with the given message.
-     * Used when a DB operation fails unexpectedly to provide users
-     * feedback instead of a silent failure.
-     *
-     * @param message the error message to display
-     */
-    private void showError(String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Error");
-        alert.setHeaderText("An error occurred");
-        alert.setContentText(message);
-        alert.showAndWait();
     }
 
     // ----------------------------------------------------------------
