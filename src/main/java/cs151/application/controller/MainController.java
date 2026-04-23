@@ -11,6 +11,11 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuButton;
 import javafx.stage.Stage;
 
+/**
+ * Controller for the Home view.
+ * Handles navigation to all major pages of the application
+ * and manages the View/Edit menu and close button.
+ */
 public class MainController {
 
     @FXML
@@ -21,6 +26,7 @@ public class MainController {
 
     /**
      * The operation instantiates homepage once the program is initialized.
+     * Sets the home page title label.
      */
     @FXML
     public void initialize() {
@@ -29,6 +35,8 @@ public class MainController {
 
     /**
      * The operation redirects the user to the Define Deck page.
+     *
+     * @param event the action event triggered by the button
      */
     @FXML
     protected void goToDefineDeckOp(ActionEvent event) {
@@ -36,7 +44,7 @@ public class MainController {
             FXMLLoader loader = new FXMLLoader(
                     Main.class.getResource("view/define-deck-view.fxml"));
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(loader.load(), 600, 500));
+            stage.setScene(new Scene(loader.load(), 700, 600));
             stage.show();
         } catch (Exception e) {
             e.printStackTrace();
@@ -45,6 +53,8 @@ public class MainController {
 
     /**
      * The operation redirects the user to the Define Flashcards page.
+     *
+     * @param event the action event triggered by the button
      */
     @FXML
     public void goToDefineFlashcardsOp(ActionEvent event) {
@@ -52,7 +62,7 @@ public class MainController {
             FXMLLoader loader = new FXMLLoader(
                     Main.class.getResource("view/define-flashcard-view.fxml"));
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(loader.load(), 600, 600));
+            stage.setScene(new Scene(loader.load(), 700, 600));
             stage.show();
         } catch (Exception e) {
             e.printStackTrace();
@@ -62,6 +72,8 @@ public class MainController {
     /**
      * The operation redirects the user to the List Deck page.
      * Called from the View/Edit MenuButton.
+     *
+     * @param event the action event triggered by the menu item
      */
     @FXML
     protected void goToListDecksOp(ActionEvent event) {
@@ -69,7 +81,7 @@ public class MainController {
             FXMLLoader loader = new FXMLLoader(
                     Main.class.getResource("view/list-decks-view.fxml"));
             Stage stage = (Stage) viewEditMenuBtn.getScene().getWindow();
-            stage.setScene(new Scene(loader.load(), 600, 500));
+            stage.setScene(new Scene(loader.load(), 700, 600));
             stage.show();
         } catch (Exception e) {
             e.printStackTrace();
@@ -79,6 +91,8 @@ public class MainController {
     /**
      * The operation redirects the user to the List Flashcards page.
      * Called from the View/Edit MenuButton.
+     *
+     * @param event the action event triggered by the menu item
      */
     @FXML
     protected void goToListFlashcardsOp(ActionEvent event) {
@@ -86,7 +100,7 @@ public class MainController {
             FXMLLoader loader = new FXMLLoader(
                     Main.class.getResource("view/list-flashcards-view.fxml"));
             Stage stage = (Stage) viewEditMenuBtn.getScene().getWindow();
-            stage.setScene(new Scene(loader.load(), 600, 500));
+            stage.setScene(new Scene(loader.load(), 700, 600));
             stage.show();
         } catch (Exception e) {
             e.printStackTrace();
@@ -95,6 +109,8 @@ public class MainController {
 
     /**
      * The operation redirects the user to the Search Flashcards page.
+     *
+     * @param event the action event triggered by the button
      */
     @FXML
     public void goToSearchFlashcardsOp(ActionEvent event) {
@@ -102,7 +118,7 @@ public class MainController {
             FXMLLoader loader = new FXMLLoader(
                     Main.class.getResource("view/search-flashcard-view.fxml"));
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(loader.load(), 700, 500));
+            stage.setScene(new Scene(loader.load(), 700, 600));
             stage.show();
         } catch (Exception e) {
             e.printStackTrace();
@@ -110,7 +126,7 @@ public class MainController {
     }
 
     /**
-     * The operation terminates the program.
+     * Exits the application when the close button is clicked.
      */
     @FXML
     protected void onCloseButtonClickOp() {

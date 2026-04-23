@@ -20,9 +20,7 @@
 }
 
 
-/*
-* Home page styling
-*/
+/* Home page styling */
 #flashcardTitle {
     -fx-font-size: 36px;
     -fx-font-family: "Microsoft JhengHei UI";
@@ -78,9 +76,6 @@
 }
 
 
-.primary-btn {
-}
-
 .deck-description {
     -fx-background-color: #f5f5f5;
     -fx-background-radius: 4;
@@ -91,7 +86,7 @@
     -fx-font-size: 13px;
 }
 
-/* Style the Text node inside */
+/* Style the text node inside */
 .deck-description .text {
     -fx-fill: #555555;
     -fx-font-size: 13px;

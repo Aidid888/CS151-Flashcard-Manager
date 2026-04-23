@@ -1,7 +1,12 @@
 # Name of application: Flashcard Manager
-### Version: 0.6
+### Version: 0.7
 
 ## Who did what:
+
+### Version: 0.7
+1. Aiden Tat: Modified selection feature, Fixed database 
+2. Andrew Song: 
+3. Katherine Shih: Modified window sizing
 
 ### Version: 0.6
 1. Aiden Tat: Modified DefineFlashcard Page and Search Flashcard Page

@@ -13,6 +13,11 @@ import javafx.stage.Stage;
 
 import java.sql.SQLException;
 
+/**
+ * Controller for the Edit Flashcard popup window.
+ * Populates the form with an existing flashcard's data and handles
+ * saving updates to the front text, back text, and status in the database.
+ */
 public class EditFlashcardController {
 
     // Read-only fields
@@ -37,8 +42,11 @@ public class EditFlashcardController {
     }
 
     /**
+     * Populates all form fields with data from the selected flashcard.
+     * Displays read-only fields (deck name, creation date, last reviewed).
      * Called by ListFlashcardController before the popup is shown.
-     * Populates all fields from the given Flashcard record.
+     *
+     * @param card the flashcard whose data will be displayed and edited
      */
     public void setFlashcard(Flashcard card) {
         this.flashcard = card;
@@ -56,10 +64,22 @@ public class EditFlashcardController {
         statusComboBox.setValue(card.status());
     }
 
+    /**
+     * Sets a callback to run after the flashcard is successfully saved.
+     * Used to notify the calling controller to refresh its flashcard list.
+     *
+     * @param callback the Runnable to execute after a successful save
+     */
     public void setOnSaved(Runnable callback) {
         this.onSaved = callback;
     }
 
+    /**
+     * Handles saving the edited flashcard when the Save button is clicked.
+     * Validates input fields and saves the edited flashcard to the database.
+     * Runs the onSaved callback and closes the window on success,
+     * or displays an error alert on failure.
+     */
     @FXML
     private void onSave() {
         String front = frontTextArea.getText().trim();
@@ -81,15 +101,27 @@ public class EditFlashcardController {
         }
     }
 
+    /**
+     * Closes the popup window without saving any changes.
+     */
     @FXML
     private void onCancel() {
         closeWindow();
     }
 
+    /**
+     * Closes the current popup window.
+     */
     private void closeWindow() {
         ((Stage) frontTextArea.getScene().getWindow()).close();
     }
 
+    /**
+     * Displays a modal error alert dialog to the user.
+     *
+     * @param title   the title text of the alert window
+     * @param message the error message displayed in the alert body
+     */
     private void showAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR, message, ButtonType.OK);
         alert.setTitle(title);

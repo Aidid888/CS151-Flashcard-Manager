@@ -22,6 +22,10 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Controller for the Flashcard List view.
+ * Handles displaying, filtering, editing, and deleting flashcards.
+ */
 public class ListFlashcardController {
 
     @FXML private ComboBox<Deck>               deckComboBox;
@@ -40,9 +44,9 @@ public class ListFlashcardController {
             FXCollections.observableArrayList();
 
     /**
-     * Initializes TableView for list of Flashcards and ComboBox for Deck selection.
+     * Initializes the TableView columns, delete button, row double-click, and
+     * deck ComboBox on load. Shows all flashcards until a deck is selected.
      */
-
     @FXML
     public void initialize() {
         flashcardTable.setColumnResizePolicy(
@@ -113,8 +117,10 @@ public class ListFlashcardController {
     }
 
     /**
+     * Pre-selects the given deck in the ComboBox and filters the table to match.
      * Called by ListDeckController when navigating from a specific deck row.
-     * Pre-selects that deck in the ComboBox and filters the table automatically.
+     *
+     * @param deck the deck to pre-select
      */
     public void setDeck(Deck deck) {
         // Match by id in case the list contains a freshly fetched copy
@@ -128,17 +134,20 @@ public class ListFlashcardController {
     }
 
     /**
-     * Event handler — ComboBox selection
+     * Filters the TableView to show only flashcards from the selected deck.
+     * Triggered when the user picks a deck from the ComboBox.
      */
     @FXML
     private void onDeckSelected() {
+        // Event handler — ComboBox selection.
         Deck selected = deckComboBox.getSelectionModel().getSelectedItem();
         if (selected == null) return;
         loadFlashcardsForDeck(selected);
     }
 
     /**
-     * Loads data from database into combobox.
+     * Loads all decks from the database into the deck ComboBox.
+     * Shows an error alert if the query fails.
      */
     private void loadDeckComboBox() {
         try {
@@ -148,6 +157,13 @@ public class ListFlashcardController {
             showAlert("Database Error", "Could not load decks:\n" + e.getMessage());
         }
     }
+
+    /**
+     * Loads flashcards for the given deck into the TableView,
+     * sorted by creation date descending.
+     *
+     * @param deck the deck whose flashcards will be loaded
+     */
 
     private void loadFlashcardsForDeck(Deck deck) {
         try {
@@ -160,6 +176,10 @@ public class ListFlashcardController {
         }
     }
 
+    /**
+     * Loads all flashcards into the TableView,
+     * sorted by creation date descending.
+     */
     private void loadAllFlashcards() {
         try {
             List<Flashcard> all = flashcardDao.searchFlashcards("");
@@ -172,6 +192,8 @@ public class ListFlashcardController {
 
     /**
      * The operation returns the user back to homepage.
+     *
+     * @param event the action event triggered by the back button
      */
     @FXML
     private void goBackHomeOp(ActionEvent event) {
@@ -179,13 +201,19 @@ public class ListFlashcardController {
             FXMLLoader loader = new FXMLLoader(
                     Main.class.getResource("view/home-view.fxml"));
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(loader.load(), 600, 500));
+            stage.setScene(new Scene(loader.load(), 700, 600));
             stage.show();
         } catch (IOException e) {
             showAlert("Navigation Error", "Could not return home:\n" + e.getMessage());
         }
     }
 
+    /**
+     * Opens a modal edit popup for the given flashcard.
+     * Refreshes the TableView after the popup closes if changes were saved.
+     *
+     * @param card the flashcard to edit
+     */
     private void openEditPopup(Flashcard card) {
         try {
             FXMLLoader loader = new FXMLLoader(
@@ -211,10 +239,11 @@ public class ListFlashcardController {
     }
 
     /**
-     * Helper method that displays a popup dialog to the user.
-     * @param title
-     * @param message
-     */
+     * Helper method that displays modal error alert with the given title and message.
+     *
+     *  @param title   the alert window title
+     *  @param message the error message to display
+     *  */
     private void showAlert(String title, String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR, message, ButtonType.OK);
         alert.setTitle(title);
@@ -223,9 +252,15 @@ public class ListFlashcardController {
     }
 
     /**
-     * Renders Deck records in the ComboBox by name instead of the default Object.toString() output.
+     * Custom ListCell that renders a Deck by its name in the ComboBox instead of the default Object.toString() output.
      */
     private static class DeckCell extends ListCell<Deck> {
+        /**
+         * Sets the cell text to the deck's name, or clears it if the cell is empty.
+         *
+         * @param deck  the Deck to display
+         * @param empty true if the cell has no data, false otherwise
+         */
         @Override
         protected void updateItem(Deck deck, boolean empty) {
             super.updateItem(deck, empty);

@@ -19,6 +19,11 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Controller for List Deck page.
+ * Manages displaying, updating, and deleting flashcard decks in a TableView.
+ * Also handles navigation to the flashcard list for a selected deck.
+ */
 public class ListDeckController {
 
     @FXML private TableView<Deck>            deckTable;
@@ -33,6 +38,7 @@ public class ListDeckController {
     private final FlashcardDao flashcardDao = new FlashcardDao();
     private final ObservableList<Deck> deckList = FXCollections.observableArrayList();
     private final java.util.Map<Integer, Integer> flashcardCounts = new java.util.HashMap<>();
+
     /**
      * Initializes TableView and list of Decks when the page loads.
      */
@@ -77,7 +83,8 @@ public class ListDeckController {
     }
 
     /**
-     * Loads list of Decks from the database.
+     * Loads list of Decks from the database and refreshes the Tableview.
+     * Flashcard count for each deck is also displayed.
      */
     private void loadDecks() {
         try {
@@ -95,6 +102,8 @@ public class ListDeckController {
 
     /**
      * The operation returns the user back to homepage.
+     *
+     * @param event the action event triggered by clicking the back button
      */
     @FXML
     private void goBackHomeOp(ActionEvent event) {
@@ -102,7 +111,7 @@ public class ListDeckController {
             FXMLLoader loader = new FXMLLoader(
                     Main.class.getResource("view/home-view.fxml"));
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(loader.load(), 600, 500));
+            stage.setScene(new Scene(loader.load(), 700, 600));
             stage.show();
         } catch (Exception e) {
             e.printStackTrace();
@@ -113,6 +122,12 @@ public class ListDeckController {
     // Action handlers called in the Action trigger button.
     // ---------------------------------------------------------------
 
+    /**
+     * Opens the flashcard list view for the given deck.
+     * Updates the deck's last visited timestamp before navigating
+     *
+     * @param deck the selected deck corresponding flashcards will be displayed
+     */
     private void handleSeeAllFlashcards(Deck deck) {
         try {
             // Stamp last visited when user navigates into a deck
@@ -137,6 +152,12 @@ public class ListDeckController {
         }
     }
 
+    /**
+     * Opens a dialog for users to edit the name and description of a deck.
+     * Saves changes to the database and refreshes the TableView on confirmation.
+     *
+     * @param deck the deck that will be updated
+     */
     private void handleUpdateDeck(Deck deck) {
         // --- Name field ---
         TextField nameField = new TextField(deck.deckName());
@@ -176,6 +197,12 @@ public class ListDeckController {
         }
     }
 
+    /**
+     * Prompts the user to confirm deletion of a deck, then removes it and all
+     * associated flashcards from the database if confirmed.
+     *
+     * @param deck the deck that will be deleted
+     */
     private void handleDeleteDeck(Deck deck) {
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
                 "Delete \"" + deck.deckName() + "\" and all its flashcards?",
@@ -197,9 +224,10 @@ public class ListDeckController {
 
     /**
      * Helper method that displays a popup dialog to the user.
-     * @param type
-     * @param title
-     * @param message
+     *
+     * @param type    the type of alert (e.g., ERROR, WARNING, INFORMATION)
+     * @param title   the title text of the alert window
+     * @param message the body message displayed in the alert
      */
     private void showAlert(Alert.AlertType type, String title, String message) {
         Alert alert = new Alert(type, message, ButtonType.OK);
@@ -214,8 +242,8 @@ public class ListDeckController {
 
     /**
      * Renders a trigger button for actions on every non-empty row.
-     * Kept as a private inner class so it can call the outer controller's
-     * handler methods directly — no extra coupling needed.
+     * Provides menu options to view flashcards, update, or delete the deck in that row.
+     * Private inner class can directly access the outer controller's handler methods without additional coupling.
      */
     private class ActionCell extends TableCell<Deck, Void> {
 
@@ -236,6 +264,12 @@ public class ListDeckController {
                     menu.show(menuBtn, javafx.geometry.Side.BOTTOM, 0, 0));
         }
 
+        /**
+         * Shows the menu button for non-empty rows and hides it for empty rows.
+         *
+         * @param item The new item for the cell.
+         * @param empty true if the row contains no data, false otherwise.
+         */
         @Override
         protected void updateItem(Void item, boolean empty) {
             super.updateItem(item, empty);

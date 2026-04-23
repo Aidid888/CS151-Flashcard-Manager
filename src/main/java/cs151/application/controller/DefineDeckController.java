@@ -18,6 +18,8 @@ import cs151.application.database.DeckDao;
 
 /**
  * Controller for Define Deck page.
+ * Handles user input for creating a new flashcard deck, including
+ * input validation and saving the deck to the database.
  */
 public class DefineDeckController {
 
@@ -52,6 +54,9 @@ public class DefineDeckController {
 
     /**
      * The operation returns the user back to homepage.
+     * Displays an error message if navigation fails.
+     *
+     * @param event the action event triggered by clicking the back button
      */
     @FXML
     protected void goBackHomeOp(ActionEvent event) {
@@ -63,7 +68,7 @@ public class DefineDeckController {
 
             FXMLLoader loader = new FXMLLoader(
                     Main.class.getResource("view/home-view.fxml"));
-            Scene scene = new Scene(loader.load(), 600, 500);
+            Scene scene = new Scene(loader.load(), 700, 600);
 
             stage.setScene(scene);
             stage.show();
@@ -75,7 +80,11 @@ public class DefineDeckController {
     }
 
     /**
-     * The operation handles deck creation.
+     * The operation handles new deck creation.
+     * Validates the name is non-empty and unique before inserting the
+     * deck into the database. Displays a respective success or error message.
+     *
+     * @param event the action event triggered by clicking the Create Deck button
      */
     @FXML
     private void createDeckOp(ActionEvent event) {
