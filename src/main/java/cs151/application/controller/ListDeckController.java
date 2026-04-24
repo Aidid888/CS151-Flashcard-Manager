@@ -20,6 +20,8 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
+import cs151.application.util.DateTimeUtil;
+
 /**
  * Controller for List Deck page.
  * Manages displaying, updating, and deleting flashcard decks in a TableView.
@@ -65,11 +67,18 @@ public class ListDeckController {
 
         creationDateColumn.setCellValueFactory(cell ->
                 new javafx.beans.property.SimpleStringProperty(
-                        cell.getValue().creationDate() == null ? "" : cell.getValue().creationDate()));
+                        cell.getValue().creationDate() == null
+                                ? ""
+                                : DateTimeUtil.utcToLocal(cell.getValue().creationDate())
+                ));
 
-        lastVisitedColumn.setCellValueFactory(cell ->
-                new javafx.beans.property.SimpleStringProperty(
-                        cell.getValue().lastVisited() == null ? "Never" : cell.getValue().lastVisited()));
+        lastVisitedColumn.setCellValueFactory(cell -> {
+            String lastVisited = cell.getValue().lastVisited();
+            if (lastVisited == null) {
+                return new javafx.beans.property.SimpleStringProperty("Never");
+            }
+            return new javafx.beans.property.SimpleStringProperty(DateTimeUtil.utcToLocal(lastVisited));
+        });
 
         totalFlashcardsInDeck.setCellValueFactory(cell ->
                 new javafx.beans.property.SimpleObjectProperty<>(
@@ -154,6 +163,18 @@ public class ListDeckController {
     }
 
     /**
+     *
+     *      Checks whether the given SQLException was caused by a
+     *      unique constraint violation (eg. duplicate deck name).
+     *      @param e the SQLException thrown during a database operation
+     *      @return true if the exception likely represents a duplicate name
+     *              constraint violation; false otherwise
+     */
+    private boolean isDuplicateNameError(SQLException e) {
+        return e.getMessage() != null && e.getMessage().toLowerCase().contains("unique");
+    }
+
+    /**
      * Opens a dialog for users to edit the name and description of a deck.
      * Saves changes to the database and refreshes the TableView on confirmation.
      *
@@ -193,8 +214,15 @@ public class ListDeckController {
             deckDao.updateDeck(deck.deckName(), newName, descField.getText().trim());
             loadDecks();
         } catch (SQLException e) {
-            AlertHelper.showAlert(Alert.AlertType.ERROR, "Database Error",
-                    "Could not update deck:\n" + e.getMessage());
+            if (isDuplicateNameError(e)) {
+                AlertHelper.showAlert(Alert.AlertType.ERROR,
+                        "Duplicate Name",
+                        "Deck name already exists.");
+            } else {
+                AlertHelper.showAlert(Alert.AlertType.ERROR,
+                        "Database Error",
+                        "Could not update deck:\n" + e.getMessage());
+            }
         }
     }
 

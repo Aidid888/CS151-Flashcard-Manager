@@ -3,7 +3,6 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
 
 <VBox xmlns:fx="http://javafx.com/fxml"
       fx:controller="cs151.application.controller.EditFlashcardController"
@@ -37,13 +36,9 @@
     <Label text="Status"/>
     <ComboBox fx:id="statusComboBox" maxWidth="Infinity"/>
 
-    <!-- CREATION DATE (read-only) -->
-    <Label text="Creation Date"/>
-    <TextField fx:id="creationDateField"
-               editable="false"
-               mouseTransparent="true"
-               focusTraversable="false"
-               style="-fx-background-color: #e8e8e8; -fx-text-fill: #555555;"/>
+    <!-- CREATION DATE (now editable) -->
+    <Label text="Creation Date (YYYY-MM-DD HH:MM:SS)"/>
+    <TextField fx:id="creationDateField" maxWidth="Infinity"/>
 
     <!-- LAST REVIEW DATE (read-only) -->
     <Label text="Last Review Date"/>

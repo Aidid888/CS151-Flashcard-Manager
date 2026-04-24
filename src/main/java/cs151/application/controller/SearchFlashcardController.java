@@ -13,11 +13,15 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
+
+import cs151.application.util.DateTimeUtil;
 
 /**
  * Controller for the Search Flashcard view.
@@ -78,9 +82,17 @@ public class SearchFlashcardController {
         // Simple string columns — property names match Flashcard record accessors
         deckNameColumn    .setCellValueFactory(cell -> new javafx.beans.property.SimpleStringProperty(cell.getValue().deckName()));
         statusColumn      .setCellValueFactory(cell -> new javafx.beans.property.SimpleStringProperty(cell.getValue().status()));
-        creationDateColumn.setCellValueFactory(cell -> new javafx.beans.property.SimpleStringProperty(cell.getValue().creationDate()));
-        lastViewedColumn  .setCellValueFactory(cell -> new javafx.beans.property.SimpleStringProperty(
-                cell.getValue().lastViewed() == null ? "Never" : cell.getValue().lastViewed()));
+        creationDateColumn.setCellValueFactory(cell ->
+                new javafx.beans.property.SimpleStringProperty(
+                        DateTimeUtil.utcToLocal(cell.getValue().creationDate())
+                ));
+        lastViewedColumn.setCellValueFactory(cell -> {
+            String lastViewed = cell.getValue().lastViewed();
+            if (lastViewed == null) {
+                return new javafx.beans.property.SimpleStringProperty("Never");
+            }
+            return new javafx.beans.property.SimpleStringProperty(DateTimeUtil.utcToLocal(lastViewed));
+        });
 
         // TextArea columns: bind value then override rendering to show first line only
         frontTextColumn.setCellValueFactory(cell -> new javafx.beans.property.SimpleStringProperty(cell.getValue().frontText()));
@@ -88,6 +100,17 @@ public class SearchFlashcardController {
 
         // Delete column has no data property — entirely driven by its cell factory
         deleteColumn.setCellFactory(buildDeleteCellFactory());
+
+        // Double-click to edit
+        flashcardTable.setRowFactory(tv -> {
+            TableRow<Flashcard> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && !row.isEmpty()) {
+                    openEditPopup(row.getItem());
+                }
+            });
+            return row;
+        });
 
         flashcardTable.setItems(tableData);
 
@@ -196,6 +219,35 @@ public class SearchFlashcardController {
                 .filter(btn -> btn == ButtonType.OK)
                 .isPresent();
     }
+
+    /**
+     * Opens a modal edit popup for the given flashcard.
+     * Refreshes the table after the popup closes if changes were saved.
+     *
+     * @param card the flashcard to edit
+     */
+    private void openEditPopup(Flashcard card) {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    Main.class.getResource("view/edit-flashcard-view.fxml"));
+            Stage popupStage = new Stage();
+            popupStage.initModality(Modality.APPLICATION_MODAL);
+            popupStage.setTitle("Edit Flashcard");
+            popupStage.setScene(new Scene(loader.load(), 450, 600));
+
+            EditFlashcardController editController = loader.getController();
+            editController.setFlashcard(card);
+            editController.setOnSaved(() -> {
+                // Refresh the table with current search term
+                loadResults(searchField.getText());
+            });
+
+            popupStage.showAndWait();
+        } catch (IOException e) {
+            AlertHelper.showAlert(Alert.AlertType.ERROR, "Navigation Error", "Could not open edit window:\n" + e.getMessage());
+        }
+    }
+
 
     // ----------------------------------------------------------------
     // Navigation

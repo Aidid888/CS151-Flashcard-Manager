@@ -6,30 +6,30 @@ import cs151.application.util.AlertHelper;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 import java.sql.SQLException;
+import cs151.application.util.DateTimeUtil;
 
 /**
  * Controller for the Edit Flashcard popup window.
  * Populates the form with an existing flashcard's data and handles
- * saving updates to the front text, back text, and status in the database.
+ * saving updates to the front text, back text, status, and creation date in the database.
  */
 public class EditFlashcardController {
 
     // Read-only fields
     @FXML private TextField deckField;
-    @FXML private TextField creationDateField;
     @FXML private TextField lastReviewedField;
 
     // Editable fields
     @FXML private TextArea frontTextArea;
     @FXML private TextArea backTextArea;
     @FXML private ComboBox<String> statusComboBox;
+    @FXML private TextField creationDateField;
 
     private Flashcard flashcard;
     private Runnable onSaved;
@@ -44,7 +44,7 @@ public class EditFlashcardController {
 
     /**
      * Populates all form fields with data from the selected flashcard.
-     * Displays read-only fields (deck name, creation date, last reviewed).
+     * Displays read-only fields (deck name, last reviewed) and editable fields.
      * Called by ListFlashcardController before the popup is shown.
      *
      * @param card the flashcard whose data will be displayed and edited
@@ -54,17 +54,16 @@ public class EditFlashcardController {
 
         // Read-only fields — populated but not editable
         deckField.setText(card.deckName());
-        creationDateField.setText(card.creationDate());
         lastReviewedField.setText(
-                card.lastViewed() == null ? "Never" : card.lastViewed()
+                card.lastViewed() == null ? "Never" : DateTimeUtil.utcToLocal(card.lastViewed())
         );
 
         // Editable fields
         frontTextArea.setText(card.frontText());
         backTextArea.setText(card.backText());
         statusComboBox.setValue(card.status());
+        creationDateField.setText(DateTimeUtil.utcToLocal(card.creationDate()));
     }
-
     /**
      * Sets a callback to run after the flashcard is successfully saved.
      * Used to notify the calling controller to refresh its flashcard list.
@@ -86,19 +85,24 @@ public class EditFlashcardController {
         String front = frontTextArea.getText().trim();
         String back = backTextArea.getText().trim();
         String status = statusComboBox.getValue();
+        String creationDateLocal = creationDateField.getText().trim();
 
         // Basic validation
-        if (front.isEmpty() || back.isEmpty() || status == null) {
-            AlertHelper.showAlert(Alert.AlertType.ERROR, "Validation Error", "Front text, back text, and status are required.");
+        if (front.isEmpty() || back.isEmpty() || status == null || creationDateLocal.isEmpty()) {
+            AlertHelper.showAlert(Alert.AlertType.ERROR, "Validation Error",
+                    "Front text, back text, status, and creation date are required.");
             return;
         }
 
         try {
-            flashcardDao.updateFlashcard(flashcard.id(), front, back, status);
+            // Convert local time back to UTC for storage
+            String creationDateUtc = DateTimeUtil.localToUtc(creationDateLocal);
+            flashcardDao.updateFlashcardWithDate(flashcard.id(), front, back, status, creationDateUtc);
             if (onSaved != null) onSaved.run();
             closeWindow();
         } catch (SQLException e) {
-            AlertHelper.showAlert(Alert.AlertType.ERROR, "Database Error", "Could not save flashcard:\n" + e.getMessage());
+            AlertHelper.showAlert(Alert.AlertType.ERROR, "Database Error",
+                    "Could not save flashcard:\n" + e.getMessage());
         }
     }
 

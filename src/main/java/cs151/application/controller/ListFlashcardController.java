@@ -23,6 +23,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import cs151.application.util.DateTimeUtil;
+
 /**
  * Controller for the Flashcard List view.
  * Handles displaying, filtering, editing, and deleting flashcards.
@@ -62,12 +64,16 @@ public class ListFlashcardController {
         statusColumn.setCellValueFactory(cell ->
                 new SimpleStringProperty(cell.getValue().status()));
         creationDateColumn.setCellValueFactory(cell ->
-                new SimpleStringProperty(cell.getValue().creationDate()));
-        lastViewedColumn.setCellValueFactory(cell ->
                 new SimpleStringProperty(
-                        cell.getValue().lastViewed() == null
-                                ? "Never"
-                                : cell.getValue().lastViewed()));
+                        DateTimeUtil.utcToLocal(cell.getValue().creationDate())
+                ));
+        lastViewedColumn.setCellValueFactory(cell -> {
+            String lastViewed = cell.getValue().lastViewed();
+            if (lastViewed == null) {
+                return new SimpleStringProperty("Never");
+            }
+            return new SimpleStringProperty(DateTimeUtil.utcToLocal(lastViewed));
+        });
         deleteColumn.setCellFactory(col -> new TableCell<>() {
             private final Button deleteBtn = new Button("Delete");
             {

@@ -41,7 +41,7 @@ public class FlashcardDao {
 
     /**
      * Inserts a new flashcard into Flashcard_table linked to the given deck.
-     * creation_date is set automatically by the database via DEFAULT (datetime('now')).
+     * creation_date is set automatically by the database via DEFAULT (datetime('now', 'localtime')).
      * last_viewed is left null — it is only set when the card is actually reviewed.
      * front_text, back_text, and status are all required (NOT NULL in schema).
      */
@@ -295,6 +295,29 @@ public class FlashcardDao {
         return results;
     }
 
+    /**
+     * Updates the front text, back text, status, and creation date of an existing flashcard.
+     * Use this when the user edits the full card content including the creation date.
+     * Does NOT touch last_viewed.
+     */
+    public void updateFlashcardWithDate(int flashcardId, String frontText,
+                                        String backText, String status, String creationDate) throws SQLException {
+        String sql = """
+        UPDATE Flashcard_table
+        SET front_text = ?, back_text = ?, status = ?, creation_date = ?
+        WHERE id = ?
+        """;
+        try (Connection conn = db.openConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, frontText);
+            stmt.setString(2, backText);
+            stmt.setString(3, status);
+            stmt.setString(4, creationDate);
+            stmt.setInt(5, flashcardId);
+            stmt.executeUpdate();
+            logger.info("Updated flashcard id: {} with new creation date", flashcardId);
+        }
+    }
     // ---------------------------------------------------------
     // PRIVATE HELPERS
     // ---------------------------------------------------------
