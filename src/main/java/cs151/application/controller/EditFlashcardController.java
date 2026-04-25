@@ -85,19 +85,16 @@ public class EditFlashcardController {
         String front = frontTextArea.getText().trim();
         String back = backTextArea.getText().trim();
         String status = statusComboBox.getValue();
-        String creationDateLocal = creationDateField.getText().trim();
 
         // Basic validation
-        if (front.isEmpty() || back.isEmpty() || status == null || creationDateLocal.isEmpty()) {
+        if (front.isEmpty() || back.isEmpty() || status == null) {
             AlertHelper.showAlert(Alert.AlertType.ERROR, "Validation Error",
-                    "Front text, back text, status, and creation date are required.");
+                    "Front text, back text, and status are required.");
             return;
         }
 
         try {
-            // Convert local time back to UTC for storage
-            String creationDateUtc = DateTimeUtil.localToUtc(creationDateLocal);
-            flashcardDao.updateFlashcardWithDate(flashcard.id(), front, back, status, creationDateUtc);
+            flashcardDao.updateFlashcardWithDate(flashcard.id(), front, back, status, flashcard.creationDate());
             if (onSaved != null) onSaved.run();
             closeWindow();
         } catch (SQLException e) {

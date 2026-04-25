@@ -181,22 +181,50 @@ public class ListDeckController {
      * @param deck the deck that will be updated
      */
     private void handleUpdateDeck(Deck deck) {
-        // --- Name field ---
+        // --- Editable fields ---
         TextField nameField = new TextField(deck.deckName());
         nameField.setPromptText("Deck name");
 
-        // --- Description field ---
         TextField descField = new TextField(deck.description() == null ? "" : deck.description());
         descField.setPromptText("Description (optional)");
 
-        // --- Dialog ---
+        // --- Read-only: Creation Date ---
+        String creationDateStr = deck.creationDate() == null
+                ? "Unknown"
+                : DateTimeUtil.utcToLocal(deck.creationDate());
+        TextField creationDateField = new TextField(creationDateStr);
+        creationDateField.setEditable(false);
+        creationDateField.setFocusTraversable(false);
+        creationDateField.setStyle(
+                "-fx-background-color: derive(-fx-base, 10%);" +
+                        "-fx-text-fill: -fx-text-inner-color;" +
+                        "-fx-opacity: 0.75;"
+        );
+
+        // --- Read-only: Last View Date ---
+        String lastViewedStr = deck.lastVisited() == null
+                ? "Never"
+                : DateTimeUtil.utcToLocal(deck.lastVisited());
+        TextField lastViewedField = new TextField(lastViewedStr);
+        lastViewedField.setEditable(false);
+        lastViewedField.setFocusTraversable(false);
+        lastViewedField.setStyle(
+                "-fx-background-color: derive(-fx-base, 10%);" +
+                        "-fx-text-fill: -fx-text-inner-color;" +
+                        "-fx-opacity: 0.75;"
+        );
+
+        // --- Dialog layout ---
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle("Update Deck");
         dialog.setHeaderText("Edit \"" + deck.deckName() + "\"");
 
         javafx.scene.layout.VBox content = new javafx.scene.layout.VBox(8,
-                new Label("Name:"), nameField,
-                new Label("Description:"), descField);
+                new Label("Name:"),        nameField,
+                new Label("Description:"), descField,
+                new Label("Created:"),     creationDateField,
+                new Label("Last Viewed:"), lastViewedField
+        );
         content.setPadding(new javafx.geometry.Insets(10));
         dialog.getDialogPane().setContent(content);
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
@@ -215,12 +243,9 @@ public class ListDeckController {
             loadDecks();
         } catch (SQLException e) {
             if (isDuplicateNameError(e)) {
-                AlertHelper.showAlert(Alert.AlertType.ERROR,
-                        "Duplicate Name",
-                        "Deck name already exists.");
+                AlertHelper.showAlert(Alert.AlertType.ERROR, "Duplicate Name", "Deck name already exists.");
             } else {
-                AlertHelper.showAlert(Alert.AlertType.ERROR,
-                        "Database Error",
+                AlertHelper.showAlert(Alert.AlertType.ERROR, "Database Error",
                         "Could not update deck:\n" + e.getMessage());
             }
         }

@@ -36,9 +36,14 @@
     <Label text="Status"/>
     <ComboBox fx:id="statusComboBox" maxWidth="Infinity"/>
 
-    <!-- CREATION DATE (now editable) -->
-    <Label text="Creation Date (YYYY-MM-DD HH:MM:SS)"/>
-    <TextField fx:id="creationDateField" maxWidth="Infinity"/>
+    <!-- CREATION DATE (read-only) -->
+    <Label text="Creation Date" />
+    <TextField fx:id="creationDateField"
+               maxWidth="Infinity"
+               editable="false"
+               mouseTransparent="true"
+               focusTraversable="false"
+               style="-fx-background-color: #e8e8e8; -fx-text-fill: #555555;" />
 
     <!-- LAST REVIEW DATE (read-only) -->
     <Label text="Last Review Date"/>

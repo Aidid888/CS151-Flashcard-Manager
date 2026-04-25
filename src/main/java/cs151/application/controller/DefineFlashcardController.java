@@ -66,15 +66,7 @@ public class DefineFlashcardController {
 
         // Show deck description whenever the selection changes
         deckComboBox.valueProperty().addListener((obs, oldDeck, newDeck) -> {
-            if (newDeck == null || newDeck.description() == null
-                    || newDeck.description().isBlank()) {
-                deckDescriptionBox.setVisible(false);
-                deckDescriptionBox.setManaged(false);
-            } else {
-                deckDescriptionText.setText(newDeck.description()); // ✅ was deckDescriptionLabel
-                deckDescriptionBox.setVisible(true);
-                deckDescriptionBox.setManaged(true);
-            }
+            updateDeckDescriptionVisibility();
         });
     }
 
@@ -202,7 +194,6 @@ public class DefineFlashcardController {
 
     /**
      * Clears all input fields and error labels to their default state.
-     * Also hides the deck description box.
      */
     private void clearFields() {
         frontTextArea.clear();
@@ -212,8 +203,20 @@ public class DefineFlashcardController {
         frontErrorLabel.setText("");
         backErrorLabel.setText("");
         statusErrorLabel.setText("");
-        deckDescriptionBox.setVisible(false);
-        deckDescriptionBox.setManaged(false);
+        updateDeckDescriptionVisibility();
+    }
+
+    private void updateDeckDescriptionVisibility() {
+        Deck currentDeck = (Deck) deckComboBox.getValue();
+        if (currentDeck == null || currentDeck.description() == null
+                || currentDeck.description().isBlank()) {
+            deckDescriptionBox.setVisible(false);
+            deckDescriptionBox.setManaged(false);
+        } else {
+            deckDescriptionText.setText(currentDeck.description());
+            deckDescriptionBox.setVisible(true);
+            deckDescriptionBox.setManaged(true);
+        }
     }
 
     /**
