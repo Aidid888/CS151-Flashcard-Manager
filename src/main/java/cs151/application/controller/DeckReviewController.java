@@ -56,6 +56,8 @@ public class DeckReviewController {
     private int currentIndex;
     private Flashcard currentFlashcard;
     private boolean isModified = false;
+    private boolean isLoading = false;
+    private String lastCommittedFilter = "All";
 
     /**
      * Initializes the UI components when the page loads.
@@ -85,9 +87,15 @@ public class DeckReviewController {
         lastReviewedField.setStyle(readOnlyStyle);
 
         // Track modifications
-        frontTextArea.textProperty().addListener((obs, oldVal, newVal) -> isModified = true);
-        backTextArea.textProperty().addListener((obs, oldVal, newVal) -> isModified = true);
-        statusComboBox.valueProperty().addListener((obs, oldVal, newVal) -> isModified = true);
+        frontTextArea.textProperty().addListener((obs, oldVal, newVal) -> {
+            if (!isLoading) isModified = true;
+        });
+        backTextArea.textProperty().addListener((obs, oldVal, newVal) -> {
+            if (!isLoading) isModified = true;
+        });
+        statusComboBox.valueProperty().addListener((obs, oldVal, newVal) -> {
+            if (!isLoading) isModified = true;
+        });
 
         // Wrap text in TextAreas
         frontTextArea.setWrapText(true);
@@ -142,6 +150,13 @@ public class DeckReviewController {
         }
     }
 
+    private void enableNavigation() {
+        saveBtn.setDisable(false);
+        frontTextArea.setDisable(false);
+        backTextArea.setDisable(false);
+        statusComboBox.setDisable(false);
+    }
+
     /**
      * Displays the current flashcard in the UI and updates navigation buttons.
      */
@@ -150,6 +165,7 @@ public class DeckReviewController {
             return;
         }
 
+        enableNavigation();
         currentFlashcard = filteredFlashcards.get(currentIndex);
 
         // Update read-only fields
@@ -161,9 +177,11 @@ public class DeckReviewController {
         lastReviewedField.setText(now.format(formatter));
 
         // Update editable fields
+        isLoading = true;
         frontTextArea.setText(currentFlashcard.frontText());
         backTextArea.setText(currentFlashcard.backText());
         statusComboBox.setValue(currentFlashcard.status());
+        isLoading = false;
 
         // Update card count
         cardCountLabel.setText((currentIndex + 1) + " / " + filteredFlashcards.size());
@@ -189,11 +207,14 @@ public class DeckReviewController {
      * Clears all editable fields when no flashcards are available.
      */
     private void clearFields() {
+        isLoading = true;
         frontTextArea.clear();
         backTextArea.clear();
         statusComboBox.getSelectionModel().clearSelection();
         creationDateField.clear();
         lastReviewedField.clear();
+        isLoading = false;
+        isModified = false;
     }
 
     /**
@@ -203,6 +224,27 @@ public class DeckReviewController {
         previousBtn.setDisable(true);
         nextBtn.setDisable(true);
         saveBtn.setDisable(true);
+        frontTextArea.setDisable(true);
+        backTextArea.setDisable(true);
+        statusComboBox.setDisable(true);
+    }
+
+    /**
+     * Shows a 3-button unsaved changes dialog.
+     * Returns the ButtonType the user clicked.
+     */
+    private ButtonType showUnsavedChangesDialog(String context) {
+        ButtonType saveBtnType   = new ButtonType("Save",    ButtonBar.ButtonData.OK_DONE);
+        ButtonType discardBtnType = new ButtonType("Discard", ButtonBar.ButtonData.NO);
+        ButtonType cancelBtnType = new ButtonType("Cancel",  ButtonBar.ButtonData.CANCEL_CLOSE);
+
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
+                "Do you want to save before " + context + "?",
+                saveBtnType, discardBtnType, cancelBtnType);
+        confirm.setTitle("Unsaved Changes");
+        confirm.setHeaderText("You have unsaved changes");
+
+        return confirm.showAndWait().orElse(cancelBtnType);
     }
 
     /**
@@ -211,18 +253,20 @@ public class DeckReviewController {
      */
     @FXML
     private void onFilterChanged() {
+        if (isLoading) return;
         if (isModified) {
-            Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
-            confirm.setTitle("Unsaved Changes");
-            confirm.setHeaderText("You have unsaved changes");
-            confirm.setContentText("Do you want to save before changing the filter?");
-            confirm.showAndWait().ifPresent(response -> {
-                if (response == ButtonType.OK) {
-                    saveCurrentFlashcard();
-                }
-            });
+            ButtonType result = showUnsavedChangesDialog("changing the filter");
+            if (result.getButtonData() == ButtonBar.ButtonData.OK_DONE) {
+                saveCurrentFlashcard();
+            } else if (result.getButtonData() == ButtonBar.ButtonData.CANCEL_CLOSE) {
+                isLoading = true;
+                filterComboBox.setValue(lastCommittedFilter);
+                isLoading = false;
+                return;
+            }
         }
 
+        lastCommittedFilter = filterComboBox.getValue();
         currentIndex = 0;
         loadFilteredFlashcards();
     }
@@ -233,15 +277,12 @@ public class DeckReviewController {
     @FXML
     private void onNext() {
         if (isModified) {
-            Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
-            confirm.setTitle("Unsaved Changes");
-            confirm.setHeaderText("You have unsaved changes");
-            confirm.setContentText("Do you want to save before moving to the next card?");
-            confirm.showAndWait().ifPresent(response -> {
-                if (response == ButtonType.OK) {
-                    saveCurrentFlashcard();
-                }
-            });
+            ButtonType result = showUnsavedChangesDialog("moving to the next card");
+            if (result.getButtonData() == ButtonBar.ButtonData.OK_DONE) {
+                saveCurrentFlashcard();
+            } else if (result.getButtonData() == ButtonBar.ButtonData.CANCEL_CLOSE) {
+                return;
+            }
         }
 
         if (currentIndex < filteredFlashcards.size() - 1) {
@@ -256,15 +297,12 @@ public class DeckReviewController {
     @FXML
     private void onPrevious() {
         if (isModified) {
-            Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
-            confirm.setTitle("Unsaved Changes");
-            confirm.setHeaderText("You have unsaved changes");
-            confirm.setContentText("Do you want to save before moving to the previous card?");
-            confirm.showAndWait().ifPresent(response -> {
-                if (response == ButtonType.OK) {
-                    saveCurrentFlashcard();
-                }
-            });
+            ButtonType result = showUnsavedChangesDialog("moving to the previous card");
+            if (result.getButtonData() == ButtonBar.ButtonData.OK_DONE) {
+                saveCurrentFlashcard();
+            } else if (result.getButtonData() == ButtonBar.ButtonData.CANCEL_CLOSE) {
+                return;
+            }
         }
 
         if (currentIndex > 0) {
@@ -333,15 +371,12 @@ public class DeckReviewController {
     @FXML
     private void onCancel(ActionEvent event) {
         if (isModified) {
-            Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
-            confirm.setTitle("Unsaved Changes");
-            confirm.setHeaderText("You have unsaved changes");
-            confirm.setContentText("Do you want to save before leaving?");
-            confirm.showAndWait().ifPresent(response -> {
-                if (response == ButtonType.OK) {
-                    saveCurrentFlashcard();
-                }
-            });
+            ButtonType result = showUnsavedChangesDialog("leaving");
+            if (result.getButtonData() == ButtonBar.ButtonData.OK_DONE) {
+                saveCurrentFlashcard();
+            } else if (result.getButtonData() == ButtonBar.ButtonData.CANCEL_CLOSE) {
+                return;
+            }
         }
 
         try {
@@ -362,15 +397,12 @@ public class DeckReviewController {
     @FXML
     private void goBackHomeOp(ActionEvent event) {
         if (isModified) {
-            Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
-            confirm.setTitle("Unsaved Changes");
-            confirm.setHeaderText("You have unsaved changes");
-            confirm.setContentText("Do you want to save before leaving?");
-            confirm.showAndWait().ifPresent(response -> {
-                if (response == ButtonType.OK) {
-                    saveCurrentFlashcard();
-                }
-            });
+            ButtonType result = showUnsavedChangesDialog("leaving");
+            if (result.getButtonData() == ButtonBar.ButtonData.OK_DONE) {
+                saveCurrentFlashcard();
+            } else if (result.getButtonData() == ButtonBar.ButtonData.CANCEL_CLOSE) {
+                return;
+            }
         }
 
         try {
