@@ -1,13 +1,24 @@
 # Name of application: Flashcard Manager
-### Version: 0.7
+### Version: 0.6
 
 ## Who did what:
 
+<<<<<<< Updated upstream
+=======
 ### Version: 0.7
 1. Aiden Tat: Modified edit feature, Fixed database 
-2. Andrew Song: 
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
+2. Andrew Song: Modified to accommodate local time, fixed edit feature, database
+=======
+2. Andrew Song: Set time to local instead of UTC, edit time feature, fixed edit 
+>>>>>>> Stashed changes
+=======
+2. Andrew Song: Set time to local instead of UTC, edit time feature, fixed edit 
+>>>>>>> Stashed changes
 3. Katherine Shih: Modified window, Developed alert class, fixed documentation
 
+>>>>>>> Stashed changes
 ### Version: 0.6
 1. Aiden Tat: Modified DefineFlashcard Page and Search Flashcard Page
 2. Andrew Song: Developed global search and delete flashcard
