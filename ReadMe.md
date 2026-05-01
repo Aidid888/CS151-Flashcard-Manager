@@ -9,7 +9,11 @@
 1. Aiden Tat: Modified edit feature, Fixed database 
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 2. Andrew Song: Modified to accommodate local time, fixed edit feature, database
+=======
+2. Andrew Song: Set time to local instead of UTC, edit time feature, fixed edit 
+>>>>>>> Stashed changes
 =======
 2. Andrew Song: Set time to local instead of UTC, edit time feature, fixed edit 
 >>>>>>> Stashed changes
