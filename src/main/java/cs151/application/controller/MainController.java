@@ -142,7 +142,7 @@ public class MainController {
             e.printStackTrace();
         }
     }
-}
+
     /**
      * Exits the application when the close button is clicked.
      */
@@ -151,3 +151,5 @@ public class MainController {
         Platform.exit();
     }
 
+
+}

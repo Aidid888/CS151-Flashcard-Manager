@@ -25,7 +25,7 @@
     <!-- Navigation Buttons -->
     <Button text="Define New Deck" styleClass="home-btns" onAction="#goToDefineDeckOp"/>
     <Button text="Define New Flashcard" styleClass="home-btns" onAction="#goToDefineFlashcardsOp"/>
-    <Button text="Review Decks" styleClass="home-btns"/>
+    <Button text="Review Decks" styleClass="home-btns" onAction="#goToReviewDeckOp"/>
     <MenuButton fx:id="viewEditMenuBtn" text="View/Edit" styleClass="home-btns">
         <items>
             <MenuItem text="Decks" onAction="#goToListDecksOp"/>
