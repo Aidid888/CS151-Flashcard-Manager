@@ -1,7 +1,7 @@
 package cs151.application.controller;
 
 import cs151.application.Main;
-import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -12,10 +12,14 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import cs151.application.database.DeckDao;
 
 /**
  * Controller for Define Deck page.
+ * Handles user input for creating a new flashcard deck, including
+ * input validation and saving the deck to the database.
  */
 public class DefineDeckController {
 
@@ -32,45 +36,59 @@ public class DefineDeckController {
     private Label promptMsgLbl;
 
     private final DeckDao deckDao = new DeckDao();
+    private static final Logger logger = LoggerFactory.getLogger(DefineDeckController.class);
 
     /**
      * Handles initialization once page loads.
      * Disables the Create Deck button until the text field is filled by the user.
      */
     public void initialize() {
-        createDeckBtn.disableProperty().bind(deckNameField.textProperty().isEmpty());
+        createDeckBtn.disableProperty().bind(
+                Bindings.createBooleanBinding(
+                        () -> deckNameField.getText().trim().isEmpty(),
+                        deckNameField.textProperty()
+                )
+        );
         descriptionField.setWrapText(true);
     }
 
     /**
      * The operation returns the user back to homepage.
+     * Displays an error message if navigation fails.
+     *
+     * @param event the action event triggered by clicking the back button
      */
     @FXML
     protected void goBackHomeOp(ActionEvent event) {
         try {
+            if (!(event.getSource() instanceof Node source)) return;
+            Scene currentScene = source.getScene();
+            if (currentScene == null) return;
+            Stage stage = (Stage) currentScene.getWindow();
 
             FXMLLoader loader = new FXMLLoader(
                     Main.class.getResource("view/home-view.fxml"));
-
-            Scene scene = new Scene(loader.load(), 600, 500);
-
-            Stage stage = (Stage)((Node)event.getSource())
-                    .getScene().getWindow();
+            Scene scene = new Scene(loader.load(), 700, 600);
 
             stage.setScene(scene);
             stage.show();
 
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
+            promptMsgLbl.setText("Navigation error: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
     /**
-     * The operation handles deck creation.
+     * The operation handles new deck creation.
+     * Validates the name is non-empty and unique before inserting the
+     * deck into the database. Displays a respective success or error message.
+     *
+     * @param event the action event triggered by clicking the Create Deck button
      */
     @FXML
     private void createDeckOp(ActionEvent event) {
+        promptMsgLbl.setText("");
         try {
             String name = deckNameField.getText().trim();
             String description = descriptionField.getText().trim();
@@ -78,6 +96,12 @@ public class DefineDeckController {
             // --- Validate: name cannot be empty ---
             if (name.isEmpty()) {
                 promptMsgLbl.setText("Deck name cannot be empty.");
+                return;
+            }
+
+            // --- Validate: name length ---
+            if (name.length() > 255) {
+                promptMsgLbl.setText("Deck name must be 255 characters or fewer.");
                 return;
             }
 
@@ -94,7 +118,7 @@ public class DefineDeckController {
 
         } catch (Exception e) {
             promptMsgLbl.setText("Error: " + e.getMessage());
-            System.out.println(e.getMessage());
+            logger.error("Failed to create deck: {}", e.getMessage(), e);
         }
     }
 }

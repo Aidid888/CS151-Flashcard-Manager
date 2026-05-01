@@ -3,6 +3,7 @@ package cs151.application.controller;
 import cs151.application.Main;
 import cs151.application.database.FlashcardDao;
 import cs151.application.database.FlashcardDao.Flashcard;
+import cs151.application.util.AlertHelper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -12,12 +13,21 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
+import cs151.application.util.DateTimeUtil;
+
+/**
+ * Controller for the Search Flashcard view.
+ * Handles live search filtering, displaying results in a TableView,
+ * and deleting individual flashcards.
+ */
 public class SearchFlashcardController {
 
     // ----------------------------------------------------------------
@@ -37,7 +47,7 @@ public class SearchFlashcardController {
     @FXML private TableColumn<Flashcard, String> creationDateColumn;
     @FXML private TableColumn<Flashcard, String> lastViewedColumn;
 
-    /** Button-per-row column; no backing Flashcard property — built via cell factory. */
+    /** Button-per-row column; built entirely via cell factory. */
     @FXML private TableColumn<Flashcard, Void> deleteColumn;
 
     // ----------------------------------------------------------------
@@ -52,8 +62,7 @@ public class SearchFlashcardController {
 
     /**
      * Mutable backing list for the TableView.
-     * Held as a field so deleteRow() can remove a single item in O(n)
-     * without issuing a new DB query after every deletion.
+     * Held as a field so deleteRow() can remove a single item.
      */
     private ObservableList<Flashcard> tableData;
 
@@ -62,13 +71,8 @@ public class SearchFlashcardController {
     // ----------------------------------------------------------------
 
     /**
-     * Sets up the controller after all @FXML fields are injected:
-     *  1. Creates the DAO and the observable backing list.
-     *  2. Binds data columns to Flashcard record accessors via PropertyValueFactory.
-     *  3. Applies a first-line-only cell factory to the two TextArea-backed columns.
-     *  4. Wires the delete column with a button cell factory.
-     *  5. Loads all flashcards into the table (empty keyword = wildcard).
-     *  6. Attaches a ChangeListener so the table filters live as the user types.
+     * Initializes the TableView columns, delete button, and search listener on load.
+     * Defaults to showing all flashcards until the user types in the search field.
      */
     @FXML
     public void initialize() {
@@ -78,9 +82,17 @@ public class SearchFlashcardController {
         // Simple string columns — property names match Flashcard record accessors
         deckNameColumn    .setCellValueFactory(cell -> new javafx.beans.property.SimpleStringProperty(cell.getValue().deckName()));
         statusColumn      .setCellValueFactory(cell -> new javafx.beans.property.SimpleStringProperty(cell.getValue().status()));
-        creationDateColumn.setCellValueFactory(cell -> new javafx.beans.property.SimpleStringProperty(cell.getValue().creationDate()));
-        lastViewedColumn  .setCellValueFactory(cell -> new javafx.beans.property.SimpleStringProperty(
-                cell.getValue().lastViewed() == null ? "Never" : cell.getValue().lastViewed()));
+        creationDateColumn.setCellValueFactory(cell ->
+                new javafx.beans.property.SimpleStringProperty(
+                        DateTimeUtil.utcToLocal(cell.getValue().creationDate())
+                ));
+        lastViewedColumn.setCellValueFactory(cell -> {
+            String lastViewed = cell.getValue().lastViewed();
+            if (lastViewed == null) {
+                return new javafx.beans.property.SimpleStringProperty("Never");
+            }
+            return new javafx.beans.property.SimpleStringProperty(DateTimeUtil.utcToLocal(lastViewed));
+        });
 
         // TextArea columns: bind value then override rendering to show first line only
         frontTextColumn.setCellValueFactory(cell -> new javafx.beans.property.SimpleStringProperty(cell.getValue().frontText()));
@@ -89,11 +101,22 @@ public class SearchFlashcardController {
         // Delete column has no data property — entirely driven by its cell factory
         deleteColumn.setCellFactory(buildDeleteCellFactory());
 
+        // Double-click to edit
+        flashcardTable.setRowFactory(tv -> {
+            TableRow<Flashcard> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && !row.isEmpty()) {
+                    openEditPopup(row.getItem());
+                }
+            });
+            return row;
+        });
+
         flashcardTable.setItems(tableData);
 
         loadResults("");   // show all cards on first open
 
-        // Re-query on every keystroke; newVal is the current field text
+        // Re-query on every keystroke
         searchField.textProperty().addListener(
                 (obs, oldVal, newVal) -> loadResults(newVal));
     }
@@ -104,10 +127,9 @@ public class SearchFlashcardController {
 
     /**
      * Queries the database with the given keyword and refreshes the table.
-     * A blank keyword returns every flashcard (the DAO uses a wildcard pattern).
-     * On SQLException the table is cleared rather than crashing the UI.
+     * A blank keyword returns all flashcards. Clears the table on failure.
      *
-     * @param keyword raw text from searchField; trimmed before being sent to DAO
+     * @param keyword the search term from the search field
      */
     private void loadResults(String keyword) {
         try {
@@ -120,10 +142,9 @@ public class SearchFlashcardController {
     }
 
     /**
-     * Returns a TableCell that renders only the first line of a multi-line string.
-     * Satisfies the requirement: "If a field is TextArea, only the first line
-     * of the data is shown."
-     * split("\\R", 2) handles \n, \r\n, and \r uniformly.
+     * Returns a TableCell that displays only the first line of a multi-line string.
+     * Used for front and back text columns to keep rows compact.
+     * Method split("\\R", 2) handles \n, \r\n, and \r uniformly.
      */
     private TableCell<Flashcard, String> firstLineCell() {
         return new TableCell<>() {
@@ -140,12 +161,11 @@ public class SearchFlashcardController {
     }
 
     /**
-     * Builds a Callback that produces a Delete button inside every non-empty row.
+     * Builds a cell factory that renders a Delete button on each non-empty row.
+     * Prompts for confirmation before deleting the flashcard from the database
+     * and removing it from the table.
      *
-     * On button click:
-     *  1. A confirmation dialog is displayed with a preview of the card's front text.
-     *  2. If confirmed, the flashcard is deleted from the DB via the DAO.
-     *  3. The row is removed directly from tableData — no full re-query needed.
+     * @return a Callback that produces delete button cells for the delete column
      */
     private Callback<TableColumn<Flashcard, Void>, TableCell<Flashcard, Void>>
     buildDeleteCellFactory() {
@@ -167,7 +187,7 @@ public class SearchFlashcardController {
                             tableData.remove(card); // instant UI update, no re-query
                         } catch (SQLException ex) {
                             ex.printStackTrace();
-                            showError("Delete failed: " + ex.getMessage());
+                            AlertHelper.showAlert(Alert.AlertType.ERROR, "Delete failed: ", "Could not delete flashcard:\n" + ex.getMessage());
                         }
                     }
                 });
@@ -187,7 +207,7 @@ public class SearchFlashcardController {
      * Shows only the first line of frontText so the dialog stays compact.
      *
      * @param card the flashcard the user clicked Delete on
-     * @return true if the user pressed OK; false if they cancelled
+     * @return true if the user confirmed; false if canceled
      */
     private boolean confirmDeletion(Flashcard card) {
         String preview = card.frontText().split("\\R", 2)[0];
@@ -201,33 +221,49 @@ public class SearchFlashcardController {
     }
 
     /**
-     * Shows a generic error alert. Used when a DB operation fails unexpectedly
-     * so the user gets feedback instead of a silent failure.
+     * Opens a modal edit popup for the given flashcard.
+     * Refreshes the table after the popup closes if changes were saved.
      *
-     * @param message the error detail to display
+     * @param card the flashcard to edit
      */
-    private void showError(String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Error");
-        alert.setHeaderText("An error occurred");
-        alert.setContentText(message);
-        alert.showAndWait();
+    private void openEditPopup(Flashcard card) {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    Main.class.getResource("view/edit-flashcard-view.fxml"));
+            Stage popupStage = new Stage();
+            popupStage.initModality(Modality.APPLICATION_MODAL);
+            popupStage.setTitle("Edit Flashcard");
+            popupStage.setScene(new Scene(loader.load(), 450, 600));
+
+            EditFlashcardController editController = loader.getController();
+            editController.setFlashcard(card);
+            editController.setOnSaved(() -> {
+                // Refresh the table with current search term
+                loadResults(searchField.getText());
+            });
+
+            popupStage.showAndWait();
+        } catch (IOException e) {
+            AlertHelper.showAlert(Alert.AlertType.ERROR, "Navigation Error", "Could not open edit window:\n" + e.getMessage());
+        }
     }
+
 
     // ----------------------------------------------------------------
     // Navigation
     // ----------------------------------------------------------------
 
     /**
-     * Navigates back to the home view when the Back button is pressed.
-     * Loads home-view.fxml and replaces the current stage scene.
+     * Navigates the user back to the home view.
+     *
+     * @param event the action event triggered by the back button
      */
     @FXML
     private void goBackHomeOp(ActionEvent event) {
         try {
             FXMLLoader loader = new FXMLLoader(
                     Main.class.getResource("view/home-view.fxml"));
-            Scene scene = new Scene(loader.load(), 600, 500);
+            Scene scene = new Scene(loader.load(), 700, 600);
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(scene);
             stage.show();

@@ -10,7 +10,7 @@ import java.util.List;
 public class FlashcardDao {
 
     private static final Logger logger = LoggerFactory.getLogger(FlashcardDao.class);
-    private final Connection conn;
+    private final DatabaseController db = DatabaseController.getInstance();
 
     /**
      * Represents a single row from Flashcard_table.
@@ -33,9 +33,7 @@ public class FlashcardDao {
      * Grabs the shared database connection from DatabaseController.
      * DatabaseController must be initialized before creating a FlashcardDao.
      */
-    public FlashcardDao() {
-        this.conn = DatabaseController.getInstance().getConnection();
-    }
+    public FlashcardDao() {}
 
     // ---------------------------------------------------------
     // INSERT
@@ -43,25 +41,42 @@ public class FlashcardDao {
 
     /**
      * Inserts a new flashcard into Flashcard_table linked to the given deck.
-     * creation_date is set automatically by the database via DEFAULT (datetime('now')).
+     * creation_date is set automatically by the database via DEFAULT (datetime('now', 'localtime')).
      * last_viewed is left null — it is only set when the card is actually reviewed.
      * front_text, back_text, and status are all required (NOT NULL in schema).
      */
-    public void insertFlashcard(int deckId, String deckName, String frontText,
+    public void insertFlashcard(int deckId, String frontText,
                                 String backText, String status) throws SQLException {
+        // Resolve the canonical deck_name from the DB to prevent denormalization drift
+        String resolvedDeckName = resolvedDeckName(deckId);
+
         String sql = """
-                INSERT INTO Flashcard_table (deck_id, deck_name, front_text, back_text, status)
-                VALUES (?, ?, ?, ?, ?)
-                """;
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            INSERT INTO Flashcard_table (deck_id, deck_name, front_text, back_text, status)
+            VALUES (?, ?, ?, ?, ?)
+            """;
+        try (Connection conn = db.openConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, deckId);
-            stmt.setString(2, deckName);
+            stmt.setString(2, resolvedDeckName);
             stmt.setString(3, frontText);
             stmt.setString(4, backText);
             stmt.setString(5, status);
             stmt.executeUpdate();
             logger.info("Inserted flashcard into deck_id: {}", deckId);
         }
+    }
+
+    /** Fetches the deck_name for a given deck_id. Throws if not found. */
+    private String resolvedDeckName(int deckId) throws SQLException {
+        String sql = "SELECT deck_name FROM Deck_table WHERE id = ?";
+        try (Connection conn = db.openConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, deckId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) return rs.getString("deck_name");
+            }
+        }
+        throw new SQLException("No deck found with id: " + deckId);
     }
 
     // ---------------------------------------------------------
@@ -74,18 +89,17 @@ public class FlashcardDao {
      */
     public List<Flashcard> getFlashcardsByDeckId(int deckId) throws SQLException {
         String sql = """
-                SELECT id, deck_id, deck_name, front_text, back_text, status, creation_date, last_viewed
-                FROM Flashcard_table
-                WHERE deck_id = ?
-                ORDER BY creation_date ASC
-                """;
+            SELECT id, deck_id, deck_name, front_text, back_text, status, creation_date, last_viewed
+            FROM Flashcard_table
+            WHERE deck_id = ?
+            ORDER BY creation_date ASC
+            """;
         List<Flashcard> flashcards = new ArrayList<>();
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = db.openConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, deckId);
             try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    flashcards.add(mapRow(rs));
-                }
+                while (rs.next()) flashcards.add(mapRow(rs));
             }
         }
         return flashcards;
@@ -97,20 +111,19 @@ public class FlashcardDao {
      */
     public Flashcard getFlashcardById(int flashcardId) throws SQLException {
         String sql = """
-                SELECT id, deck_id, deck_name, front_text, back_text, status, creation_date, last_viewed
-                FROM Flashcard_table
-                WHERE id = ?
-                """;
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            SELECT id, deck_id, deck_name, front_text, back_text, status, creation_date, last_viewed
+            FROM Flashcard_table WHERE id = ?
+            """;
+        try (Connection conn = db.openConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, flashcardId);
             try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return mapRow(rs);
-                }
+                if (rs.next()) return mapRow(rs);
             }
         }
         return null;
     }
+
 
     /**
      * Returns all flashcards in a deck that match a given status (e.g. "new",
@@ -119,19 +132,18 @@ public class FlashcardDao {
      */
     public List<Flashcard> getFlashcardsByStatus(int deckId, String status) throws SQLException {
         String sql = """
-                SELECT id, deck_id, deck_name, front_text, back_text, status, creation_date, last_viewed
-                FROM Flashcard_table
-                WHERE deck_id = ? AND status = ?
-                ORDER BY creation_date ASC
-                """;
+            SELECT id, deck_id, deck_name, front_text, back_text, status, creation_date, last_viewed
+            FROM Flashcard_table
+            WHERE deck_id = ? AND status = ?
+            ORDER BY creation_date ASC
+            """;
         List<Flashcard> flashcards = new ArrayList<>();
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = db.openConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, deckId);
             stmt.setString(2, status);
             try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    flashcards.add(mapRow(rs));
-                }
+                while (rs.next()) flashcards.add(mapRow(rs));
             }
         }
         return flashcards;
@@ -144,15 +156,33 @@ public class FlashcardDao {
      */
     public int getFlashcardCountByDeckId(int deckId) throws SQLException {
         String sql = "SELECT COUNT(*) FROM Flashcard_table WHERE deck_id = ?";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = db.openConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, deckId);
             try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1);
-                }
+                if (rs.next()) return rs.getInt(1);
             }
         }
         return 0;
+    }
+
+    /**
+     * Returns true if a flashcard with the given front text already exists
+     * in the specified deck (case-insensitive). Used for duplicate prevention.
+     */
+    public boolean existsByFrontText(int deckId, String frontText) throws SQLException {
+        String sql = """
+        SELECT COUNT(*) FROM Flashcard_table
+        WHERE deck_id = ? AND LOWER(front_text) = LOWER(?)
+        """;
+        try (Connection conn = db.openConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, deckId);
+            stmt.setString(2, frontText);
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next() && rs.getInt(1) > 0;
+            }
+        }
     }
 
     // ---------------------------------------------------------
@@ -167,11 +197,12 @@ public class FlashcardDao {
     public void updateFlashcard(int flashcardId, String frontText,
                                 String backText, String status) throws SQLException {
         String sql = """
-                UPDATE Flashcard_table
-                SET front_text = ?, back_text = ?, status = ?
-                WHERE id = ?
-                """;
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            UPDATE Flashcard_table
+            SET front_text = ?, back_text = ?, status = ?
+            WHERE id = ?
+            """;
+        try (Connection conn = db.openConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, frontText);
             stmt.setString(2, backText);
             stmt.setString(3, status);
@@ -187,7 +218,8 @@ public class FlashcardDao {
      */
     public void updateLastViewed(int flashcardId) throws SQLException {
         String sql = "UPDATE Flashcard_table SET last_viewed = datetime('now') WHERE id = ?";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = db.openConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, flashcardId);
             stmt.executeUpdate();
             logger.info("Updated last_viewed for flashcard id: {}", flashcardId);
@@ -201,7 +233,8 @@ public class FlashcardDao {
      */
     public void updateStatus(int flashcardId, String status) throws SQLException {
         String sql = "UPDATE Flashcard_table SET status = ? WHERE id = ?";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = db.openConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, status);
             stmt.setInt(2, flashcardId);
             stmt.executeUpdate();
@@ -219,7 +252,8 @@ public class FlashcardDao {
      */
     public void deleteFlashcard(int flashcardId) throws SQLException {
         String sql = "DELETE FROM Flashcard_table WHERE id = ?";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = db.openConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, flashcardId);
             stmt.executeUpdate();
             logger.info("Deleted flashcard id: {}", flashcardId);
@@ -243,16 +277,16 @@ public class FlashcardDao {
             SELECT id, deck_id, deck_name, front_text, back_text,
                    status, creation_date, last_viewed
             FROM Flashcard_table
-            WHERE LOWER(deck_name)  LIKE LOWER(?)
+            WHERE LOWER(deck_name) LIKE LOWER(?)
                OR LOWER(front_text) LIKE LOWER(?)
-               OR LOWER(back_text)  LIKE LOWER(?)
-               OR LOWER(status)     LIKE LOWER(?)
+               OR LOWER(back_text) LIKE LOWER(?)
+               OR LOWER(status) LIKE LOWER(?)
             ORDER BY deck_name ASC, creation_date ASC
             """;
         String pattern = "%" + keyword + "%";
         List<Flashcard> results = new ArrayList<>();
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            // All four LIKE clauses share the same wildcard pattern
+        try (Connection conn = db.openConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
             for (int i = 1; i <= 4; i++) stmt.setString(i, pattern);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) results.add(mapRow(rs));
@@ -261,6 +295,29 @@ public class FlashcardDao {
         return results;
     }
 
+    /**
+     * Updates the front text, back text, status, and creation date of an existing flashcard.
+     * Use this when the user edits the full card content including the creation date.
+     * Does NOT touch last_viewed.
+     */
+    public void updateFlashcardWithDate(int flashcardId, String frontText,
+                                        String backText, String status, String creationDate) throws SQLException {
+        String sql = """
+        UPDATE Flashcard_table
+        SET front_text = ?, back_text = ?, status = ?, creation_date = ?
+        WHERE id = ?
+        """;
+        try (Connection conn = db.openConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, frontText);
+            stmt.setString(2, backText);
+            stmt.setString(3, status);
+            stmt.setString(4, creationDate);
+            stmt.setInt(5, flashcardId);
+            stmt.executeUpdate();
+            logger.info("Updated flashcard id: {} with new creation date", flashcardId);
+        }
+    }
     // ---------------------------------------------------------
     // PRIVATE HELPERS
     // ---------------------------------------------------------

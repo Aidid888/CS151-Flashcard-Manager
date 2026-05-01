@@ -4,6 +4,7 @@ import cs151.application.Main;
 import cs151.application.database.DeckDao;
 import cs151.application.database.DeckDao.Deck;
 import cs151.application.database.FlashcardDao;
+import cs151.application.util.AlertHelper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -19,6 +20,13 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
+import cs151.application.util.DateTimeUtil;
+
+/**
+ * Controller for List Deck page.
+ * Manages displaying, updating, and deleting flashcard decks in a TableView.
+ * Also handles navigation to the flashcard list for a selected deck.
+ */
 public class ListDeckController {
 
     @FXML private TableView<Deck>            deckTable;
@@ -32,6 +40,7 @@ public class ListDeckController {
     private final DeckDao      deckDao      = new DeckDao();
     private final FlashcardDao flashcardDao = new FlashcardDao();
     private final ObservableList<Deck> deckList = FXCollections.observableArrayList();
+    private final java.util.Map<Integer, Integer> flashcardCounts = new java.util.HashMap<>();
 
     /**
      * Initializes TableView and list of Decks when the page loads.
@@ -39,6 +48,15 @@ public class ListDeckController {
     @FXML
     public void initialize() {
         deckTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
+        deckTable.setRowFactory(tv -> {
+            TableRow<Deck> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && !row.isEmpty()) {
+                    handleUpdateDeck(row.getItem());
+                }
+            });
+            return row;
+        });
 
         nameColumn.setCellValueFactory(cell ->
                 new javafx.beans.property.SimpleStringProperty(cell.getValue().deckName()));
@@ -49,20 +67,24 @@ public class ListDeckController {
 
         creationDateColumn.setCellValueFactory(cell ->
                 new javafx.beans.property.SimpleStringProperty(
-                        cell.getValue().creationDate() == null ? "" : cell.getValue().creationDate()));
+                        cell.getValue().creationDate() == null
+                                ? ""
+                                : DateTimeUtil.utcToLocal(cell.getValue().creationDate())
+                ));
 
-        lastVisitedColumn.setCellValueFactory(cell ->
-                new javafx.beans.property.SimpleStringProperty(
-                        cell.getValue().lastVisited() == null ? "Never" : cell.getValue().lastVisited()));
-
-        totalFlashcardsInDeck.setCellValueFactory(cell -> {
-            try {
-                int count = flashcardDao.getFlashcardCountByDeckId(cell.getValue().id());
-                return new javafx.beans.property.SimpleObjectProperty<>(count);
-            } catch (SQLException e) {
-                return new javafx.beans.property.SimpleObjectProperty<>(0);
+        lastVisitedColumn.setCellValueFactory(cell -> {
+            String lastVisited = cell.getValue().lastVisited();
+            if (lastVisited == null) {
+                return new javafx.beans.property.SimpleStringProperty("Never");
             }
+            return new javafx.beans.property.SimpleStringProperty(DateTimeUtil.utcToLocal(lastVisited));
         });
+
+        totalFlashcardsInDeck.setCellValueFactory(cell ->
+                new javafx.beans.property.SimpleObjectProperty<>(
+                        flashcardCounts.getOrDefault(cell.getValue().id(), 0)
+                )
+        );
 
         actionsColumn.setCellFactory(col -> new ActionCell());
 
@@ -71,11 +93,16 @@ public class ListDeckController {
     }
 
     /**
-     * Loads list of Decks from the database.
+     * Loads list of Decks from the database and refreshes the Tableview.
+     * Flashcard count for each deck is also displayed.
      */
     private void loadDecks() {
         try {
             List<Deck> decks = deckDao.getAllDecks();
+            flashcardCounts.clear();
+            for (Deck d : decks) {
+                flashcardCounts.put(d.id(), flashcardDao.getFlashcardCountByDeckId(d.id()));
+            }
             deckList.setAll(decks);
             deckTable.setItems(deckList);
         } catch (Exception e) {
@@ -85,6 +112,8 @@ public class ListDeckController {
 
     /**
      * The operation returns the user back to homepage.
+     *
+     * @param event the action event triggered by clicking the back button
      */
     @FXML
     private void goBackHomeOp(ActionEvent event) {
@@ -92,7 +121,7 @@ public class ListDeckController {
             FXMLLoader loader = new FXMLLoader(
                     Main.class.getResource("view/home-view.fxml"));
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(loader.load(), 600, 500));
+            stage.setScene(new Scene(loader.load(), 700, 600));
             stage.show();
         } catch (Exception e) {
             e.printStackTrace();
@@ -103,6 +132,12 @@ public class ListDeckController {
     // Action handlers called in the Action trigger button.
     // ---------------------------------------------------------------
 
+    /**
+     * Opens the flashcard list view for the given deck.
+     * Updates the deck's last visited timestamp before navigating
+     *
+     * @param deck the selected deck corresponding flashcards will be displayed
+     */
     private void handleSeeAllFlashcards(Deck deck) {
         try {
             // Stamp last visited when user navigates into a deck
@@ -111,7 +146,7 @@ public class ListDeckController {
             FXMLLoader loader = new FXMLLoader(
                     Main.class.getResource("view/list-flashcards-view.fxml"));
             Stage stage = (Stage) deckTable.getScene().getWindow();
-            stage.setScene(new Scene(loader.load()));
+            stage.setScene(new Scene(loader.load(), 700, 600));
 
             Object controller = loader.getController();
             if (controller instanceof ListFlashcardController lfc) {
@@ -119,31 +154,77 @@ public class ListDeckController {
             }
             stage.show();
         } catch (IOException e) {
-            showAlert(Alert.AlertType.ERROR, "Navigation Error",
+            AlertHelper.showAlert(Alert.AlertType.ERROR, "Navigation Error",
                     "Could not open Flashcard view:\n" + e.getMessage());
         } catch (SQLException e) {
-            showAlert(Alert.AlertType.ERROR, "Database Error",
+            AlertHelper.showAlert(Alert.AlertType.ERROR, "Database Error",
                     "Could not update last visited:\n" + e.getMessage());
         }
     }
 
+    /**
+     *
+     *      Checks whether the given SQLException was caused by a
+     *      unique constraint violation (eg. duplicate deck name).
+     *      @param e the SQLException thrown during a database operation
+     *      @return true if the exception likely represents a duplicate name
+     *              constraint violation; false otherwise
+     */
+    private boolean isDuplicateNameError(SQLException e) {
+        return e.getMessage() != null && e.getMessage().toLowerCase().contains("unique");
+    }
+
+    /**
+     * Opens a dialog for users to edit the name and description of a deck.
+     * Saves changes to the database and refreshes the TableView on confirmation.
+     *
+     * @param deck the deck that will be updated
+     */
     private void handleUpdateDeck(Deck deck) {
-        // --- Name field ---
+        // --- Editable fields ---
         TextField nameField = new TextField(deck.deckName());
         nameField.setPromptText("Deck name");
 
-        // --- Description field ---
         TextField descField = new TextField(deck.description() == null ? "" : deck.description());
         descField.setPromptText("Description (optional)");
 
-        // --- Dialog ---
+        // --- Read-only: Creation Date ---
+        String creationDateStr = deck.creationDate() == null
+                ? "Unknown"
+                : DateTimeUtil.utcToLocal(deck.creationDate());
+        TextField creationDateField = new TextField(creationDateStr);
+        creationDateField.setEditable(false);
+        creationDateField.setFocusTraversable(false);
+        creationDateField.setStyle(
+                "-fx-background-color: derive(-fx-base, 10%);" +
+                        "-fx-text-fill: -fx-text-inner-color;" +
+                        "-fx-opacity: 0.75;"
+        );
+
+        // --- Read-only: Last View Date ---
+        String lastViewedStr = deck.lastVisited() == null
+                ? "Never"
+                : DateTimeUtil.utcToLocal(deck.lastVisited());
+        TextField lastViewedField = new TextField(lastViewedStr);
+        lastViewedField.setEditable(false);
+        lastViewedField.setFocusTraversable(false);
+        lastViewedField.setStyle(
+                "-fx-background-color: derive(-fx-base, 10%);" +
+                        "-fx-text-fill: -fx-text-inner-color;" +
+                        "-fx-opacity: 0.75;"
+        );
+
+        // --- Dialog layout ---
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.setTitle("Update Deck");
         dialog.setHeaderText("Edit \"" + deck.deckName() + "\"");
 
         javafx.scene.layout.VBox content = new javafx.scene.layout.VBox(8,
-                new Label("Name:"), nameField,
-                new Label("Description:"), descField);
+                new Label("Name:"),        nameField,
+                new Label("Description:"), descField,
+                new Label("Created:"),     creationDateField,
+                new Label("Last Viewed:"), lastViewedField
+        );
         content.setPadding(new javafx.geometry.Insets(10));
         dialog.getDialogPane().setContent(content);
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
@@ -153,7 +234,7 @@ public class ListDeckController {
 
         String newName = nameField.getText().trim();
         if (newName.isEmpty()) {
-            showAlert(Alert.AlertType.WARNING, "Validation", "Deck name cannot be empty.");
+            AlertHelper.showAlert(Alert.AlertType.WARNING, "Validation", "Deck name cannot be empty.");
             return;
         }
 
@@ -161,11 +242,21 @@ public class ListDeckController {
             deckDao.updateDeck(deck.deckName(), newName, descField.getText().trim());
             loadDecks();
         } catch (SQLException e) {
-            showAlert(Alert.AlertType.ERROR, "Database Error",
-                    "Could not update deck:\n" + e.getMessage());
+            if (isDuplicateNameError(e)) {
+                AlertHelper.showAlert(Alert.AlertType.ERROR, "Duplicate Name", "Deck name already exists.");
+            } else {
+                AlertHelper.showAlert(Alert.AlertType.ERROR, "Database Error",
+                        "Could not update deck:\n" + e.getMessage());
+            }
         }
     }
 
+    /**
+     * Prompts the user to confirm deletion of a deck, then removes it and all
+     * associated flashcards from the database if confirmed.
+     *
+     * @param deck the deck that will be deleted
+     */
     private void handleDeleteDeck(Deck deck) {
         Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
                 "Delete \"" + deck.deckName() + "\" and all its flashcards?",
@@ -180,22 +271,9 @@ public class ListDeckController {
             deckDao.deleteDeck(deck.deckName());
             loadDecks();
         } catch (SQLException e) {
-            showAlert(Alert.AlertType.ERROR, "Database Error",
+            AlertHelper.showAlert(Alert.AlertType.ERROR, "Database Error",
                     "Could not delete deck:\n" + e.getMessage());
         }
-    }
-
-    /**
-     * Helper method that displays a popup dialog to the user.
-     * @param type
-     * @param title
-     * @param message
-     */
-    private void showAlert(Alert.AlertType type, String title, String message) {
-        Alert alert = new Alert(type, message, ButtonType.OK);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.showAndWait();
     }
 
     // ---------------------------------------------------------------
@@ -204,8 +282,8 @@ public class ListDeckController {
 
     /**
      * Renders a trigger button for actions on every non-empty row.
-     * Kept as a private inner class so it can call the outer controller's
-     * handler methods directly — no extra coupling needed.
+     * Provides menu options to view flashcards, update, or delete the deck in that row.
+     * Private inner class can directly access the outer controller's handler methods without additional coupling.
      */
     private class ActionCell extends TableCell<Deck, Void> {
 
@@ -226,6 +304,12 @@ public class ListDeckController {
                     menu.show(menuBtn, javafx.geometry.Side.BOTTOM, 0, 0));
         }
 
+        /**
+         * Shows the menu button for non-empty rows and hides it for empty rows.
+         *
+         * @param item The new item for the cell.
+         * @param empty true if the row contains no data, false otherwise.
+         */
         @Override
         protected void updateItem(Void item, boolean empty) {
             super.updateItem(item, empty);

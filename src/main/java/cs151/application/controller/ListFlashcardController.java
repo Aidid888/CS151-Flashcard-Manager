@@ -5,6 +5,7 @@ import cs151.application.database.DeckDao;
 import cs151.application.database.DeckDao.Deck;
 import cs151.application.database.FlashcardDao;
 import cs151.application.database.FlashcardDao.Flashcard;
+import cs151.application.util.AlertHelper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -14,6 +15,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -21,6 +23,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import cs151.application.util.DateTimeUtil;
+
+/**
+ * Controller for the Flashcard List view.
+ * Handles displaying, filtering, editing, and deleting flashcards.
+ */
 public class ListFlashcardController {
 
     @FXML private ComboBox<Deck>               deckComboBox;
@@ -39,9 +47,9 @@ public class ListFlashcardController {
             FXCollections.observableArrayList();
 
     /**
-     * Initializes TableView for list of Flashcards and ComboBox for Deck selection.
+     * Initializes the TableView columns, delete button, row double-click, and
+     * deck ComboBox on load. Shows all flashcards until a deck is selected.
      */
-
     @FXML
     public void initialize() {
         flashcardTable.setColumnResizePolicy(
@@ -56,12 +64,16 @@ public class ListFlashcardController {
         statusColumn.setCellValueFactory(cell ->
                 new SimpleStringProperty(cell.getValue().status()));
         creationDateColumn.setCellValueFactory(cell ->
-                new SimpleStringProperty(cell.getValue().creationDate()));
-        lastViewedColumn.setCellValueFactory(cell ->
                 new SimpleStringProperty(
-                        cell.getValue().lastViewed() == null
-                                ? "Never"
-                                : cell.getValue().lastViewed()));
+                        DateTimeUtil.utcToLocal(cell.getValue().creationDate())
+                ));
+        lastViewedColumn.setCellValueFactory(cell -> {
+            String lastViewed = cell.getValue().lastViewed();
+            if (lastViewed == null) {
+                return new SimpleStringProperty("Never");
+            }
+            return new SimpleStringProperty(DateTimeUtil.utcToLocal(lastViewed));
+        });
         deleteColumn.setCellFactory(col -> new TableCell<>() {
             private final Button deleteBtn = new Button("Delete");
             {
@@ -77,7 +89,7 @@ public class ListFlashcardController {
                             flashcardDao.deleteFlashcard(card.id());
                             flashcardList.remove(card);
                         } catch (SQLException ex) {
-                            showAlert("Database Error", "Could not delete flashcard:\n" + ex.getMessage());
+                            AlertHelper.showAlert(Alert.AlertType.ERROR, "Database Error", "Could not delete flashcard:\n" + ex.getMessage());
                         }
                     });
                 });
@@ -91,6 +103,15 @@ public class ListFlashcardController {
         });
 
         flashcardTable.setItems(flashcardList);
+        flashcardTable.setRowFactory(tv -> {
+            TableRow<Flashcard> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && !row.isEmpty()) {
+                    openEditPopup(row.getItem());
+                }
+            });
+            return row;
+        });
 
         // Show deck names in the ComboBox
         deckComboBox.setCellFactory(lv -> new DeckCell());
@@ -103,8 +124,10 @@ public class ListFlashcardController {
     }
 
     /**
+     * Pre-selects the given deck in the ComboBox and filters the table to match.
      * Called by ListDeckController when navigating from a specific deck row.
-     * Pre-selects that deck in the ComboBox and filters the table automatically.
+     *
+     * @param deck the deck to pre-select
      */
     public void setDeck(Deck deck) {
         // Match by id in case the list contains a freshly fetched copy
@@ -118,26 +141,36 @@ public class ListFlashcardController {
     }
 
     /**
-     * Event handler — ComboBox selection
+     * Filters the TableView to show only flashcards from the selected deck.
+     * Triggered when the user picks a deck from the ComboBox.
      */
     @FXML
     private void onDeckSelected() {
+        // Event handler — ComboBox selection.
         Deck selected = deckComboBox.getSelectionModel().getSelectedItem();
         if (selected == null) return;
         loadFlashcardsForDeck(selected);
     }
 
     /**
-     * Loads data from database into combobox.
+     * Loads all decks from the database into the deck ComboBox.
+     * Shows an error alert if the query fails.
      */
     private void loadDeckComboBox() {
         try {
             deckComboBox.setItems(
                     FXCollections.observableArrayList(deckDao.getAllDecks()));
         } catch (SQLException e) {
-            showAlert("Database Error", "Could not load decks:\n" + e.getMessage());
+            AlertHelper.showAlert(Alert.AlertType.ERROR, "Database Error", "Could not load decks:\n" + e.getMessage());
         }
     }
+
+    /**
+     * Loads flashcards for the given deck into the TableView,
+     * sorted by creation date descending.
+     *
+     * @param deck the deck whose flashcards will be loaded
+     */
 
     private void loadFlashcardsForDeck(Deck deck) {
         try {
@@ -146,25 +179,28 @@ public class ListFlashcardController {
             cards.sort((a, b) -> b.creationDate().compareTo(a.creationDate()));
             flashcardList.setAll(cards);
         } catch (SQLException e) {
-            showAlert("Database Error", "Could not load flashcards:\n" + e.getMessage());
+            AlertHelper.showAlert(Alert.AlertType.ERROR, "Database Error", "Could not load flashcards:\n" + e.getMessage());
         }
     }
 
+    /**
+     * Loads all flashcards into the TableView,
+     * sorted by creation date descending.
+     */
     private void loadAllFlashcards() {
         try {
-            List<Flashcard> all = new ArrayList<>();
-            for (Deck deck : deckDao.getAllDecks()) {
-                all.addAll(flashcardDao.getFlashcardsByDeckId(deck.id()));
-            }
+            List<Flashcard> all = flashcardDao.searchFlashcards("");
             all.sort((a, b) -> b.creationDate().compareTo(a.creationDate()));
             flashcardList.setAll(all);
         } catch (SQLException e) {
-            showAlert("Database Error", "Could not load flashcards:\n" + e.getMessage());
+            AlertHelper.showAlert(Alert.AlertType.ERROR, "Database Error", "Could not load flashcards:\n" + e.getMessage());
         }
     }
 
     /**
      * The operation returns the user back to homepage.
+     *
+     * @param event the action event triggered by the back button
      */
     @FXML
     private void goBackHomeOp(ActionEvent event) {
@@ -172,29 +208,54 @@ public class ListFlashcardController {
             FXMLLoader loader = new FXMLLoader(
                     Main.class.getResource("view/home-view.fxml"));
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(loader.load(), 600, 500));
+            stage.setScene(new Scene(loader.load(), 700, 600));
             stage.show();
         } catch (IOException e) {
-            showAlert("Navigation Error", "Could not return home:\n" + e.getMessage());
+            AlertHelper.showAlert(Alert.AlertType.ERROR, "Navigation Error", "Could not return home:\n" + e.getMessage());
         }
     }
 
     /**
-     * Helper method that displays a popup dialog to the user.
-     * @param title
-     * @param message
+     * Opens a modal edit popup for the given flashcard.
+     * Refreshes the TableView after the popup closes if changes were saved.
+     *
+     * @param card the flashcard to edit
      */
-    private void showAlert(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR, message, ButtonType.OK);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.showAndWait();
+    private void openEditPopup(Flashcard card) {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    Main.class.getResource("view/edit-flashcard-view.fxml"));
+            Stage popupStage = new Stage();
+            popupStage.initModality(Modality.APPLICATION_MODAL); // blocks parent window
+            popupStage.setTitle("Edit Flashcard");
+            popupStage.setScene(new Scene(loader.load(), 450, 600));
+
+            EditFlashcardController editController = loader.getController();
+            editController.setFlashcard(card);
+            editController.setOnSaved(() -> {
+                // Refresh the table after saving
+                Deck selected = (Deck) deckComboBox.getSelectionModel().getSelectedItem();
+                if (selected != null) loadFlashcardsForDeck(selected);
+                else loadAllFlashcards();
+            });
+
+            popupStage.showAndWait();
+        } catch (IOException e) {
+            AlertHelper.showAlert(Alert.AlertType.ERROR, "Navigation Error", "Could not open edit window:\n" + e.getMessage());
+        }
     }
 
+
     /**
-     * Renders Deck records in the ComboBox by name instead of the default Object.toString() output.
+     * Custom ListCell that renders a Deck by its name in the ComboBox instead of the default Object.toString() output.
      */
     private static class DeckCell extends ListCell<Deck> {
+        /**
+         * Sets the cell text to the deck's name, or clears it if the cell is empty.
+         *
+         * @param deck  the Deck to display
+         * @param empty true if the cell has no data, false otherwise
+         */
         @Override
         protected void updateItem(Deck deck, boolean empty) {
             super.updateItem(deck, empty);

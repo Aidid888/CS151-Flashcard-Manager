@@ -33,7 +33,8 @@ public class DatabaseController {
                 deck_name     TEXT    NOT NULL,
                 front_text    TEXT    NOT NULL,
                 back_text     TEXT    NOT NULL,
-                status        TEXT    NOT NULL DEFAULT 'new',
+                status        TEXT    NOT NULL DEFAULT 'New'
+                                    CHECK (status IN ('New', 'Learning', 'Mastered')),
                 creation_date TEXT    NOT NULL DEFAULT (datetime('now')),
                 last_viewed   TEXT,
                 FOREIGN KEY (deck_id) REFERENCES Deck_table(id)
@@ -41,12 +42,18 @@ public class DatabaseController {
             );
             """;
 
+    //Index on deck_id for faster flashcard lookups by deck
+    private static final String CREATE_FLASHCARD_DECK_INDEX = """
+            CREATE INDEX IF NOT EXISTS idx_flashcard_deck_id
+                ON Flashcard_table(deck_id);
+            """;
+
     /**
      * Creates the singleton instance of DatabaseController.
      * Must be called once at app startup (in Main.java) before any DAO is used.
      * Calling this again after initialization has no effect.
      */
-    public static void initialize(String dbPath) {
+    public static synchronized void initialize(String dbPath) {
         if (instance == null) {
             instance = new DatabaseController(dbPath);
         }
@@ -74,15 +81,52 @@ public class DatabaseController {
     }
 
     /**
+     * Returns true if the shared connection is open and responsive.
+     * Uses a 2-second timeout for the isValid() check.
+     */
+    private boolean isConnectionValid() {
+        try {
+            return connection != null && !connection.isClosed() && connection.isValid(2);
+        } catch (SQLException e) {
+            return false;
+        }
+    }
+
+    /**
+     * Attempts to reconnect the shared connection if it has gone stale.
+     * Closes the old connection first if it's still technically open.
+     */
+    private synchronized void reconnect() {
+        logger.warn("Shared connection is invalid. Attempting to reconnect...");
+        try {
+            if (connection != null && !connection.isClosed()) {
+                connection.close();
+            }
+        } catch (SQLException ignored) {}
+        connection = null;
+        connect();
+        logger.info("Reconnection successful.");
+    }
+
+    /**
      * Opens a JDBC connection to the SQLite file at dbPath.
-     * Also enables foreign key enforcement, which SQLite has OFF by default.
+     * Also enables WAL journal mode for better read/write concurrency,
+     * and enforces foreign key constraints (SQLite has both OFF by default).
      */
     private void connect() {
         try {
             String url = "jdbc:sqlite:" + dbPath;
             connection = DriverManager.getConnection(url);
             try (Statement stmt = connection.createStatement()) {
+                // FIX #7: Enable WAL mode for better concurrent read/write performance
+                stmt.execute("PRAGMA journal_mode=WAL;");
+
                 stmt.execute("PRAGMA foreign_keys = ON;");
+                try (var rs = stmt.executeQuery("PRAGMA foreign_keys;")) {
+                    if (rs.next() && rs.getInt(1) != 1) {
+                        throw new RuntimeException("Failed to enable foreign key enforcement.");
+                    }
+                }
             }
             logger.info("Connected to SQLite database at: {}", dbPath);
         } catch (SQLException e) {
@@ -102,6 +146,8 @@ public class DatabaseController {
             logger.info("Deck_table ready.");
             stmt.execute(CREATE_FLASHCARD_TABLE);
             logger.info("Flashcard_table ready.");
+            stmt.execute(CREATE_FLASHCARD_DECK_INDEX);
+            logger.info("Flashcard deck_id index ready.");
 
             // Migrate existing databases — safe to run every startup
             try { stmt.execute("ALTER TABLE Deck_table ADD COLUMN creation_date TEXT NOT NULL DEFAULT (datetime('now'))"); } catch (SQLException ignored) {}
@@ -117,21 +163,47 @@ public class DatabaseController {
     }
 
     /**
-     * Returns the active Connection object.
-     * Used by DeckDao and FlashcardDao to run their SQL queries.
+     * Returns the active shared Connection object.
+     * Automatically reconnects if the connection has gone stale.
      */
-    public Connection getConnection() {
+    public synchronized Connection getConnection() {
+        if (!isConnectionValid()) {
+            reconnect();
+        }
         return connection;
+    }
+
+    /**
+     * Opens and returns a new short-lived connection to the SQLite database.
+     * The caller is responsible for closing it — always use in a try-with-resources.
+     * Used by DAOs for per-operation connections instead of the shared connection.
+     */
+    public Connection openConnection() throws SQLException {
+        String url = "jdbc:sqlite:" + dbPath;
+        Connection conn = DriverManager.getConnection(url);
+        try (Statement stmt = conn.createStatement()) {
+            stmt.execute("PRAGMA journal_mode=WAL;");
+            stmt.execute("PRAGMA foreign_keys = ON;");
+            try (var rs = stmt.executeQuery("PRAGMA foreign_keys;")) {
+                if (rs.next() && rs.getInt(1) != 1) {
+                    conn.close();
+                    throw new SQLException("Failed to enable foreign key enforcement.");
+                }
+            }
+        }
+        logger.debug("Opened per-operation connection to: {}", dbPath);
+        return conn;
     }
 
     /**
      * Closes the database connection gracefully.
      * Should be called when the app shuts down via Main.stop().
      */
-    public void close() {
+    public synchronized void close() {
         if (connection != null) {
             try {
                 connection.close();
+                connection = null;
                 logger.info("Database connection closed.");
             } catch (SQLException e) {
                 logger.error("Failed to close connection: {}", e.getMessage(), e);

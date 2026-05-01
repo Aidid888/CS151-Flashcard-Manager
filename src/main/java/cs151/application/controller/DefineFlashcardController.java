@@ -4,6 +4,7 @@ import cs151.application.Main;
 import cs151.application.database.DeckDao;
 import cs151.application.database.DeckDao.Deck;
 import cs151.application.database.FlashcardDao;
+import cs151.application.util.AlertHelper;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -18,6 +19,11 @@ import javafx.stage.Stage;
 import java.sql.SQLException;
 import java.util.List;
 
+/**
+ * Controller for the Define Flashcard view.
+ * Handles user input for creating a new flashcard, including deck selection,
+ * field validation, duplicate checking, and saving to the database.
+ */
 public class DefineFlashcardController {
 
     // ── FXML fields ───────────────────────────────────────────────
@@ -41,6 +47,11 @@ public class DefineFlashcardController {
 
     // ── Initialization ────────────────────────────────────────────
 
+    /**
+     * Handles initialization once page loads.
+     * Populates the deck and status ComboBoxes, configures deck name rendering,
+     * and sets up a listener to show or hide the deck description when a deck is selected.
+     */
     @FXML
     public void initialize() {
         // Deck ComboBox — display deck names instead of Object.toString()
@@ -55,21 +66,13 @@ public class DefineFlashcardController {
 
         // Show deck description whenever the selection changes
         deckComboBox.valueProperty().addListener((obs, oldDeck, newDeck) -> {
-            if (newDeck == null || newDeck.description() == null
-                    || newDeck.description().isBlank()) {
-                deckDescriptionBox.setVisible(false);
-                deckDescriptionBox.setManaged(false);
-            } else {
-                deckDescriptionText.setText(newDeck.description()); // ✅ was deckDescriptionLabel
-                deckDescriptionBox.setVisible(true);
-                deckDescriptionBox.setManaged(true);
-            }
+            updateDeckDescriptionVisibility();
         });
     }
 
     /**
-     * Called by ListDeckController when navigating from a specific deck row.
-     * Pre-selects that deck in the ComboBox automatically.
+     * Automatically pre-selects deck in the ComboBox when navigating
+     * from a specific deck row. Called by ListDeckController.
      */
     public void setDeck(Deck deck) {
         deckComboBox.getItems().stream()
@@ -81,8 +84,10 @@ public class DefineFlashcardController {
     // ── Handlers ──────────────────────────────────────────────────
 
     /**
+     * Handles saving a new flashcard when the Save button is clicked.
      * Validates fields, checks front text uniqueness within the selected deck,
-     * then inserts the flashcard into the database.
+     * then inserts the flashcard into the database. Displays corresponding
+     * success or error message.
      */
     @FXML
     private void onSaveFlashcard() {
@@ -94,28 +99,20 @@ public class DefineFlashcardController {
         String status     = statusComboBox.getValue();
 
         try {
-            // Uniqueness check: front text must be unique within the selected deck
-            List<FlashcardDao.Flashcard> existing =
-                    flashcardDao.getFlashcardsByDeckId(selectedDeck.id());
-
-            boolean duplicate = existing.stream()
-                    .anyMatch(fc -> fc.frontText().equalsIgnoreCase(frontText));
-
-            if (duplicate) {
-                frontErrorLabel.setText(
-                        "A flashcard with this front text already exists in this deck.");
+            if (flashcardDao.existsByFrontText(selectedDeck.id(), frontText)) {
+                frontErrorLabel.setText("A flashcard with this front text already exists in this deck.");
                 return;
             }
 
             flashcardDao.insertFlashcard(
-                    selectedDeck.id(), selectedDeck.deckName(),
+                    selectedDeck.id(),
                     frontText, backText, status);
 
             clearFields();
             successLabel.setText("✓ Flashcard saved successfully!");
 
         } catch (SQLException e) {
-            showAlert("Database Error", "Could not save flashcard:\n" + e.getMessage());
+            AlertHelper.showAlert(Alert.AlertType.ERROR, "Database Error", "Could not save flashcard:\n" + e.getMessage());
         }
     }
 
@@ -126,7 +123,9 @@ public class DefineFlashcardController {
     }
 
     /**
-     * Returns the user back to the home page.
+     * Operation returns the user back to the home page.
+     *
+     * @param event the action event triggered by clicking the back button
      */
     @FXML
     protected void goBackHomeOp(ActionEvent event) {
@@ -134,7 +133,7 @@ public class DefineFlashcardController {
             FXMLLoader loader = new FXMLLoader(
                     Main.class.getResource("view/home-view.fxml"));
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(loader.load(), 600, 500));
+            stage.setScene(new Scene(loader.load(), 700, 600));
             stage.show();
         } catch (Exception e) {
             e.printStackTrace();
@@ -143,18 +142,23 @@ public class DefineFlashcardController {
 
     // ── Private helpers ───────────────────────────────────────────
 
+    /**
+     * Fetches all decks from the database and populates the deck ComboBox.
+     * Displays an error alert if the database query fails.
+     */
     private void loadDeckComboBox() {
         try {
             deckComboBox.setItems(
                     FXCollections.observableArrayList(deckDao.getAllDecks()));
         } catch (SQLException e) {
-            showAlert("Database Error", "Could not load decks:\n" + e.getMessage());
+            AlertHelper.showAlert(Alert.AlertType.ERROR, "Database Error", "Could not load decks:\n" + e.getMessage());
         }
     }
 
     /**
-     * Validates all required fields. Shows inline error labels per field.
-     * Returns true only if everything passes.
+     * Validates all required input fields and displays inline error labels for any failures.
+     *
+     * @return true if all fields are valid, false if any validation check fails
      */
     private boolean validate() {
         boolean valid = true;
@@ -188,6 +192,9 @@ public class DefineFlashcardController {
         return valid;
     }
 
+    /**
+     * Clears all input fields and error labels to their default state.
+     */
     private void clearFields() {
         frontTextArea.clear();
         backTextArea.clear();
@@ -196,20 +203,34 @@ public class DefineFlashcardController {
         frontErrorLabel.setText("");
         backErrorLabel.setText("");
         statusErrorLabel.setText("");
+        updateDeckDescriptionVisibility();
     }
 
-    private void showAlert(String title, String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR, message, ButtonType.OK);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.showAndWait();
+    private void updateDeckDescriptionVisibility() {
+        Deck currentDeck = (Deck) deckComboBox.getValue();
+        if (currentDeck == null || currentDeck.description() == null
+                || currentDeck.description().isBlank()) {
+            deckDescriptionBox.setVisible(false);
+            deckDescriptionBox.setManaged(false);
+        } else {
+            deckDescriptionText.setText(currentDeck.description());
+            deckDescriptionBox.setVisible(true);
+            deckDescriptionBox.setManaged(true);
+        }
     }
 
     /**
-     * Renders Deck records in the ComboBox by deck name
+     * Custom ListCell displays a Deck's name in the ComboBox
      * instead of the default Object.toString() output.
+     * Private static class contains single protected method.
      */
     private static class DeckCell extends ListCell<Deck> {
+        /**
+         * Updates the cell text to the deck's name, or clears it if the cell is empty.
+         *
+         * @param deck the Deck object to display
+         * @param empty true if the cell contains no data, false otherwise
+         */
         @Override
         protected void updateItem(Deck deck, boolean empty) {
             super.updateItem(deck, empty);
