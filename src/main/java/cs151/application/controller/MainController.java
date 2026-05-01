@@ -126,10 +126,28 @@ public class MainController {
     }
 
     /**
+     * The operation redirects the user to the Review Deck page.
+     *
+     * @param event the action event triggered by the button
+     */
+    @FXML
+    public void goToReviewDeckOp(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    Main.class.getResource("view/review-deck-view.fxml"));
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setScene(new Scene(loader.load(), 700, 600));
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+    /**
      * Exits the application when the close button is clicked.
      */
     @FXML
     protected void onCloseButtonClickOp() {
         Platform.exit();
     }
-}
+
