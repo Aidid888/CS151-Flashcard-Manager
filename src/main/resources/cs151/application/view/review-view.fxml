@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox alignment="TOP_CENTER"
+      spacing="10"
+      styleClass="root"
+      stylesheets="@../../../css/styles.css"
+      xmlns="http://javafx.com/javafx/23"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="cs151.application.controller.ReviewController">
+
+    <padding>
+        <Insets bottom="20" left="20" right="20" top="20" />
+    </padding>
+
+    <!-- Back to Home button -->
+    <ButtonBar prefHeight="40.0" prefWidth="200.0">
+        <buttons>
+            <Button onAction="#goBackHomeOp" styleClass="back-btn" text="⌂ Back to Home" />
+        </buttons>
+    </ButtonBar>
+
+    <!-- Title -->
+    <Label styleClass="title-label" text="Review Decks" />
+
+    <!-- Search bar -->
+    <TextField fx:id="searchField"
+               promptText="Search decks by name or description..."
+               prefWidth="500" />
+
+    <!-- TableView for list of Decks -->
+    <TableView fx:id="deckTable" prefWidth="500">
+        <columns>
+            <TableColumn fx:id="nameColumn" prefWidth="150" text="Deck Name" />
+            <TableColumn fx:id="descColumn" prefWidth="200" text="Description" />
+            <TableColumn fx:id="creationDateColumn" prefWidth="130" text="Created" />
+            <TableColumn fx:id="lastVisitedColumn" prefWidth="130" text="Last Visited" />
+            <TableColumn fx:id="totalFlashcardsColumn" prefWidth="100" text="Num Flashcards" />
+        </columns>
+    </TableView>
+
+    <Label text="Double-click a deck to start reviewing" style="-fx-text-fill: gray; -fx-font-size: 11px;" />
+
+</VBox>

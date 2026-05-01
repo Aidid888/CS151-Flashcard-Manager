@@ -60,6 +60,24 @@ public class MainController {
     }
 
     /**
+     * The operation redirects the user to the Review page.
+     *
+     * @param event the action event triggered by the button
+     */
+    @FXML
+    public void goToReviewOp(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    Main.class.getResource("view/review-view.fxml"));
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setScene(new Scene(loader.load(), 700, 600));
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
      * The operation redirects the user to the List Deck page.
      * Called from the View/Edit MenuButton.
      */

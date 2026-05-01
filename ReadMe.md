@@ -7,7 +7,11 @@
 =======
 ### Version: 0.7
 1. Aiden Tat: Modified edit feature, Fixed database 
+<<<<<<< Updated upstream
 2. Andrew Song: Modified to accommodate local time, fixed edit feature, database
+=======
+2. Andrew Song: Set time to local instead of UTC, edit time feature, fixed edit 
+>>>>>>> Stashed changes
 3. Katherine Shih: Modified window, Developed alert class, fixed documentation
 
 >>>>>>> Stashed changes
