@@ -108,6 +108,8 @@
 
     <!-- Navigation + action buttons -->
     <HBox alignment="CENTER" spacing="5">
+        <Button onAction="#onCancel"
+                styleClass="secondary-btn" text="Cancel / Back to Deck List" prefWidth="200" />
         <Button fx:id="previousBtn" onAction="#onPrevious"
                 styleClass="nav-btn" text="← Prev" prefWidth="90" />
         <Button fx:id="nextBtn" onAction="#onNext"
@@ -116,8 +118,6 @@
                 styleClass="flip-btn" text="↻ Flip" prefWidth="90" />
         <Button fx:id="saveBtn" onAction="#onSave"
                 styleClass="primary-btn" text="Save" prefWidth="90" />
-        <Button onAction="#onCancel"
-                styleClass="secondary-btn" text="Cancel / Back to Deck List" prefWidth="200" />
     </HBox>
 
 </VBox>

@@ -402,7 +402,9 @@ public class DeckReviewController {
     }
 
     private void onCardClicked(MouseEvent event) {
-        if (event.getTarget() == cardStackPane) {
+        Object target = event.getTarget();
+        // Only flip if the click was NOT on a TextArea (so editing still works)
+        if (!(target instanceof TextArea)) {
             flipCard();
         }
     }
