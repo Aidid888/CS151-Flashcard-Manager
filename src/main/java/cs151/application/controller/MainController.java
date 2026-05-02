@@ -70,24 +70,6 @@ public class MainController {
     }
 
     /**
-     * The operation redirects the user to the Review page.
-     *
-     * @param event the action event triggered by the button
-     */
-    @FXML
-    public void goToReviewOp(ActionEvent event) {
-        try {
-            FXMLLoader loader = new FXMLLoader(
-                    Main.class.getResource("view/review-view.fxml"));
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(loader.load(), 700, 600));
-            stage.show();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
      * The operation redirects the user to the List Deck page.
      * Called from the View/Edit MenuButton.
      *
@@ -118,6 +100,37 @@ public class MainController {
             FXMLLoader loader = new FXMLLoader(
                     Main.class.getResource("view/list-flashcards-view.fxml"));
             Stage stage = (Stage) viewEditMenuBtn.getScene().getWindow();
+            stage.setScene(new Scene(loader.load(), 700, 600));
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * The operation redirects the user to the Review page.
+     *
+     * @param event the action event triggered by the button
+     */
+    @FXML
+    public void goToReviewOp(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    Main.class.getResource("view/review-view.fxml"));
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            stage.setScene(new Scene(loader.load(), 700, 600));
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    public void goToReportOp(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                    Main.class.getResource("view/report-view.fxml"));
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(loader.load(), 700, 600));
             stage.show();
         } catch (Exception e) {

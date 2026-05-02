@@ -91,3 +91,402 @@
     -fx-fill: #555555;
     -fx-font-size: 13px;
 }
+
+
+/*!* ═══════════════════════════════════════════════════════════*/
+/*   Root / Scene background*/
+/*   ═══════════════════════════════════════════════════════════ *!*/
+/*.root {*/
+/*    -fx-background-color: #d3ddf0;*/
+/*    -fx-font-family: "Trebuchet MS", "Segoe UI", sans-serif;*/
+/*    -fx-font-size: 13px;*/
+/*    -fx-text-fill: #1E1E2E;*/
+/*}*/
+
+/*!* ═══════════════════════════════════════════════════════════*/
+/*   Typography*/
+/*   ═══════════════════════════════════════════════════════════ *!*/
+
+/* Main page title (e.g., "Review Flashcards") */
+.title-label {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1E1E2E;
+    -fx-padding: 4 0 2 0;
+}
+
+/* Deck name displayed in the review header */
+.deck-title-label {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #3A3560;
+}
+
+/* Small labels above fields ("Status", "Created", etc.) */
+.field-label {
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #666680;
+    -fx-padding: 0 0 1 0;
+}
+
+/* "x / y" card counter */
+.card-count-label {
+    -fx-font-size: 13px;
+    -fx-text-fill: #888899;
+    -fx-font-style: italic;
+}
+
+/* Transient save / error feedback */
+.status-feedback-label {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-min-height: 18px;  /* keeps layout stable when empty */
+}
+
+/*!* ═══════════════════════════════════════════════════════════*/
+/*   Flash Card widget*/
+/*   ═══════════════════════════════════════════════════════════ *!*/
+
+/*!* Outer container — the animated StackPane *!*/
+/*.flash-card {*/
+/*    -fx-background-color: white;*/
+/*    -fx-background-radius: 14px;*/
+/*    -fx-border-color: #DDDDE8;*/
+/*    -fx-border-width: 1px;*/
+/*    -fx-border-radius: 14px;*/
+/*    -fx-effect: dropshadow(gaussian, rgba(60,55,120,0.13), 18, 0.0, 0, 4);*/
+/*    -fx-min-height: 220px;*/
+/*    -fx-cursor: hand;*/
+/*}*/
+
+/*!* Each face VBox (front / back) — fills the StackPane *!*/
+/*.card-face {*/
+/*    -fx-background-color: transparent;*/
+/*    -fx-min-height: 220px;*/
+/*}*/
+
+/*!* FRONT badge *!*/
+/*.front-badge {*/
+/*    -fx-background-color: #E8F5E9;*/
+/*    -fx-text-fill: #2E7D32;*/
+/*    -fx-font-size: 10px;*/
+/*    -fx-font-weight: bold;*/
+/*    -fx-padding: 3 8 3 8;*/
+/*    -fx-background-radius: 20px;*/
+/*}*/
+
+/*!* BACK badge *!*/
+/*.back-badge {*/
+/*    -fx-background-color: #E8EAF6;*/
+/*    -fx-text-fill: #3949AB;*/
+/*    -fx-font-size: 10px;*/
+/*    -fx-font-weight: bold;*/
+/*    -fx-padding: 3 8 3 8;*/
+/*    -fx-background-radius: 20px;*/
+/*}*/
+
+/*!* Shared base for badges (applied alongside front-badge / back-badge) *!*/
+/*.face-badge {*/
+/*    !* nothing extra needed — specifics live in front-badge / back-badge *!*/
+/*}*/
+
+/*!* Text area inside the card — styled to look like part of the card, not a form field *!*/
+/*.card-textarea {*/
+/*    -fx-background-color: transparent;*/
+/*    -fx-border-color: transparent;*/
+/*    -fx-border-width: 0;*/
+/*    -fx-background-radius: 0;*/
+/*    -fx-font-size: 15px;*/
+/*    -fx-text-fill: #1E1E2E;*/
+/*    -fx-font-family: "Trebuchet MS", "Segoe UI", sans-serif;*/
+/*    -fx-padding: 6 2 6 2;*/
+/*    -fx-focus-color: transparent;*/
+/*    -fx-faint-focus-color: transparent;*/
+/*}*/
+
+/*!* Remove the blue focus ring that JavaFX adds to TextArea *!*/
+/*.card-textarea:focused {*/
+/*    -fx-background-color: transparent;*/
+/*    -fx-effect: none;*/
+/*}*/
+
+/*!* Inner scroll pane (JavaFX wraps TextArea content in a scroll pane) *!*/
+/*.card-textarea .scroll-pane {*/
+/*    -fx-background-color: transparent;*/
+/*}*/
+
+/*.card-textarea .scroll-pane .viewport {*/
+/*    -fx-background-color: transparent;*/
+/*}*/
+
+/*.card-textarea .content {*/
+/*    -fx-background-color: transparent;*/
+/*}*/
+
+/* ═══════════════════════════════════════════════════════════
+   Date / read-only fields
+   ═══════════════════════════════════════════════════════════ */
+.date-field {
+    -fx-background-color: #EEEEF5;
+    -fx-border-color: transparent;
+    -fx-background-radius: 6px;
+    -fx-text-fill: #555566;
+    -fx-font-size: 12px;
+    -fx-padding: 5 8 5 8;
+}
+
+.date-field:focused {
+    -fx-background-color: #EEEEF5;
+    -fx-effect: none;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Buttons
+   ═══════════════════════════════════════════════════════════ */
+
+/* Shared base for all custom buttons */
+.back-btn,
+.primary-btn,
+.secondary-btn,
+.nav-btn,
+.flip-btn {
+    -fx-font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+    -fx-font-size: 13px;
+    -fx-cursor: hand;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-padding: 7 14 7 14;
+}
+
+/* Back / Home button — subtle ghost style */
+.back-btn {
+    -fx-background-color: transparent;
+    -fx-border-color: #C8C8D8;
+    -fx-border-width: 1.2px;
+    -fx-text-fill: #444455;
+}
+
+.back-btn:hover {
+    -fx-background-color: #EEEEF5;
+}
+
+/* Primary action (Save) — deep indigo */
+.primary-btn {
+    -fx-background-color: #3A3560;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-border-color: transparent;
+}
+
+.primary-btn:hover {
+    -fx-background-color: #4B4580;
+}
+
+.primary-btn:pressed {
+    -fx-background-color: #2C2848;
+}
+
+/* Secondary / Back to List button */
+.secondary-btn {
+    -fx-background-color: transparent;
+    -fx-border-color: #C8C8D8;
+    -fx-border-width: 1.2px;
+    -fx-text-fill: #444455;
+}
+
+.secondary-btn:hover {
+    -fx-background-color: #EEEEF5;
+}
+
+/* Navigation buttons (Prev / Next) */
+.nav-btn {
+    -fx-background-color: #EEEEF5;
+    -fx-border-color: transparent;
+    -fx-text-fill: #3A3560;
+}
+
+.nav-btn:hover {
+    -fx-background-color: #DDDDE8;
+}
+
+.nav-btn:disabled {
+    -fx-opacity: 0.38;
+}
+
+/* Flip button — amber accent */
+.flip-btn {
+    -fx-background-color: #FFF3E0;
+    -fx-border-color: #FFB74D;
+    -fx-border-width: 1.2px;
+    -fx-text-fill: #E65100;
+    -fx-font-weight: bold;
+}
+
+.flip-btn:hover {
+    -fx-background-color: #FFE0B2;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ComboBox
+   ═══════════════════════════════════════════════════════════ */
+.combo-box {
+    -fx-background-color: white;
+    -fx-border-color: #DDDDE8;
+    -fx-border-width: 1.2px;
+    -fx-background-radius: 7px;
+    -fx-border-radius: 7px;
+}
+
+.combo-box:focused {
+    -fx-border-color: #3A3560;
+}
+
+.combo-box .list-cell {
+    -fx-text-fill: #1E1E2E;
+    -fx-padding: 4 8 4 8;
+}
+
+/*!* ═══════════════════════════════════════════════════════════*/
+/*   TextField (standard editable)*/
+/*   ═══════════════════════════════════════════════════════════ *!*/
+/*.text-field {*/
+/*    -fx-background-color: white;*/
+/*    -fx-border-color: #DDDDE8;*/
+/*    -fx-border-width: 1.2px;*/
+/*    -fx-background-radius: 7px;*/
+/*    -fx-border-radius: 7px;*/
+/*    -fx-padding: 6 10 6 10;*/
+/*}*/
+
+/*.text-field:focused {*/
+/*    -fx-border-color: #3A3560;*/
+/*    -fx-effect: dropshadow(gaussian, rgba(58,53,96,0.12), 6, 0.0, 0, 0);*/
+/*}*/
+
+/* ═══════════════════════════════════════════════════════════
+   TableView (used in Review list and Reports)
+   ═══════════════════════════════════════════════════════════ */
+/*.table-view {*/
+/*    -fx-background-color: white;*/
+/*    -fx-border-color: #DDDDE8;*/
+/*    -fx-border-width: 1px;*/
+/*    -fx-background-radius: 8px;*/
+/*    -fx-border-radius: 8px;*/
+/*    -fx-effect: dropshadow(gaussian, rgba(60,55,120,0.07), 10, 0.0, 0, 2);*/
+/*}*/
+
+.table-view .column-header-background {
+    -fx-background-color: #F0EFF8;
+}
+
+.table-view .column-header .label {
+    -fx-font-weight: bold;
+    -fx-text-fill: #3A3560;
+    -fx-font-size: 12px;
+}
+
+.table-row-cell:even {
+    -fx-background-color: white;
+}
+
+.table-row-cell:odd {
+    -fx-background-color: #FAFAFA;
+}
+
+.table-row-cell:hover {
+    -fx-background-color: #F0EFF8;
+}
+
+/* Keep TableView text readable when a row is selected or double-clicked */
+.table-row-cell:selected,
+.table-row-cell:focused:selected {
+    -fx-background-color: #E8EAF6;
+}
+
+/* Fix text color inside selected rows */
+.table-row-cell:selected .text,
+.table-row-cell:focused:selected .text,
+.table-row-cell:selected .table-cell,
+.table-row-cell:focused:selected .table-cell {
+    -fx-fill: #1E1E2E;
+    -fx-text-fill: #1E1E2E;
+}
+/* ═══════════════════════════════════════════════════════════
+   TabPane (used in Reports)
+   ═══════════════════════════════════════════════════════════ */
+.tab-pane {
+    -fx-tab-min-height: 34px;
+}
+
+.tab-pane .tab-header-area .tab-header-background {
+    -fx-background-color: #EEEEF5;
+}
+
+.tab {
+    -fx-background-color: transparent;
+    -fx-padding: 6 16 6 16;
+}
+
+.tab:selected {
+    -fx-background-color: white;
+}
+
+.tab .tab-label {
+    -fx-font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+    -fx-font-size: 13px;
+    -fx-text-fill: #888899;
+}
+
+.tab:selected .tab-label {
+    -fx-text-fill: #3A3560;
+    -fx-font-weight: bold;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Report-specific stat cards
+   ═══════════════════════════════════════════════════════════ */
+.stat-card {
+    -fx-background-color: white;
+    -fx-background-radius: 12px;
+    -fx-border-color: #DDDDE8;
+    -fx-border-width: 1px;
+    -fx-border-radius: 12px;
+    -fx-effect: dropshadow(gaussian, rgba(60,55,120,0.09), 10, 0.0, 0, 2);
+    -fx-padding: 16 20 16 20;
+}
+
+.stat-value {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #3A3560;
+}
+
+.stat-label-text {
+    -fx-font-size: 12px;
+    -fx-text-fill: #888899;
+}
+
+/* Status colour accents */
+.new-accent      { -fx-text-fill: #1565C0; }
+.learning-accent { -fx-text-fill: #E65100; }
+.mastered-accent { -fx-text-fill: #2E7D32; }
+
+/* ═══════════════════════════════════════════════════════════
+   Scroll bar — minimal style
+   ═══════════════════════════════════════════════════════════ */
+.scroll-bar:vertical .track,
+.scroll-bar:horizontal .track {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: #C8C8D8;
+    -fx-background-radius: 4px;
+}
+
+.scroll-bar .increment-button,
+.scroll-bar .decrement-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}

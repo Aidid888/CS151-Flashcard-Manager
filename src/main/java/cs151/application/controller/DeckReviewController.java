@@ -13,23 +13,29 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+
+import javafx.animation.ScaleTransition;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.util.Duration;
 
 import java.io.IOException;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Controller for the Deck Review page.
- * Handles reviewing flashcards in a deck with filtering, navigation, and editing capabilities.
+ * Handles filtering, flipping, editing, saving, and navigating flashcards.
  */
 public class DeckReviewController {
 
     // Read-only fields
-    @FXML private TextField deckNameField;
+    @FXML private Label deckNameLabel;
     @FXML private TextField creationDateField;
     @FXML private TextField lastReviewedField;
 
@@ -41,107 +47,88 @@ public class DeckReviewController {
     // Filter
     @FXML private ComboBox<String> filterComboBox;
 
-    // Navigation buttons
+    // Card faces
+    @FXML private StackPane cardStackPane;
+    @FXML private VBox frontFace;
+    @FXML private VBox backFace;
+
+    // Buttons / labels
     @FXML private Button previousBtn;
     @FXML private Button nextBtn;
     @FXML private Button saveBtn;
-
-    // Status label
+    @FXML private Button flipBtn;
     @FXML private Label statusLabel;
     @FXML private Label cardCountLabel;
 
     private final FlashcardDao flashcardDao = new FlashcardDao();
+
     private Deck currentDeck;
     private List<Flashcard> filteredFlashcards;
-    private int currentIndex;
     private Flashcard currentFlashcard;
+    private int currentIndex = 0;
+
     private boolean isModified = false;
     private boolean isLoading = false;
     private String lastCommittedFilter = "All";
 
-    /**
-     * Initializes the UI components when the page loads.
-     */
+    private boolean showingFront = true;
+    private boolean isFlipping = false;
+
     @FXML
     public void initialize() {
-        // Setup filter ComboBox
-        filterComboBox.setItems(FXCollections.observableArrayList(
-                "All", "New", "Learning", "Mastered"));
-        filterComboBox.getSelectionModel().selectFirst();
+        filterComboBox.setItems(FXCollections.observableArrayList("All", "New", "Learning", "Mastered"));
+        filterComboBox.getSelectionModel().select("All");
 
-        // Setup status ComboBox
-        statusComboBox.setItems(FXCollections.observableArrayList(
-                "New", "Learning", "Mastered"));
+        statusComboBox.setItems(FXCollections.observableArrayList("New", "Learning", "Mastered"));
 
-        // Make read-only fields non-editable
-        deckNameField.setEditable(false);
         creationDateField.setEditable(false);
         lastReviewedField.setEditable(false);
-
-        // Style read-only fields
-        String readOnlyStyle = "-fx-background-color: derive(-fx-base, 10%);" +
-                "-fx-text-fill: -fx-text-inner-color;" +
-                "-fx-opacity: 0.75;";
-        deckNameField.setStyle(readOnlyStyle);
-        creationDateField.setStyle(readOnlyStyle);
-        lastReviewedField.setStyle(readOnlyStyle);
-
-        // Track modifications
-        frontTextArea.textProperty().addListener((obs, oldVal, newVal) -> {
-            if (!isLoading) isModified = true;
-        });
-        backTextArea.textProperty().addListener((obs, oldVal, newVal) -> {
-            if (!isLoading) isModified = true;
-        });
-        statusComboBox.valueProperty().addListener((obs, oldVal, newVal) -> {
-            if (!isLoading) isModified = true;
-        });
-
-        // Wrap text in TextAreas
         frontTextArea.setWrapText(true);
         backTextArea.setWrapText(true);
+
+        frontTextArea.textProperty().addListener((obs, oldVal, newVal) -> markModified());
+        backTextArea.textProperty().addListener((obs, oldVal, newVal) -> markModified());
+        statusComboBox.valueProperty().addListener((obs, oldVal, newVal) -> markModified());
+
+        setFaceVisible(true);
+
+        cardStackPane.setOnMouseClicked(this::onCardClicked);
     }
 
-    /**
-     * Sets the deck to review and loads its flashcards.
-     * Called by ReviewController when navigating to this page.
-     *
-     * @param deck the deck whose flashcards will be reviewed
-     */
+    /** Called by ReviewController after loading deck-review-view.fxml. */
     public void setDeck(Deck deck) {
-        this.currentDeck = deck;
-        deckNameField.setText(deck.deckName());
+        currentDeck = deck;
+        deckNameLabel.setText(deck.deckName());
         currentIndex = 0;
         loadFilteredFlashcards();
     }
 
-    /**
-     * Loads flashcards based on the current filter selection.
-     */
-    private void loadFilteredFlashcards() {
-        try {
-            String filter = filterComboBox.getValue();
-            if (filter == null) filter = "All";
+    private void markModified() {
+        if (!isLoading) {
+            isModified = true;
+            statusLabel.setText("");
+        }
+    }
 
-            if ("All".equals(filter)) {
-                filteredFlashcards = flashcardDao.getFlashcardsByDeckId(currentDeck.id());
-            } else {
-                filteredFlashcards = flashcardDao.getFlashcardsByStatus(currentDeck.id(), filter);
-            }
+    private void loadFilteredFlashcards() {
+        if (currentDeck == null) return;
+
+        try {
+            String filter = filterComboBox.getValue() == null ? "All" : filterComboBox.getValue();
+
+            filteredFlashcards = "All".equals(filter)
+                    ? flashcardDao.getFlashcardsByDeckId(currentDeck.id())
+                    : flashcardDao.getFlashcardsByStatus(currentDeck.id(), filter);
 
             if (filteredFlashcards.isEmpty()) {
-                statusLabel.setText("No flashcards found for filter: " + filter);
-                cardCountLabel.setText("0 / 0");
                 clearFields();
-                disableNavigation();
+                setReviewControlsDisabled(true);
+                cardCountLabel.setText("0 / 0");
+                statusLabel.setText("No flashcards found for filter: " + filter);
                 return;
             }
 
-            // Ensure currentIndex is valid
-            if (currentIndex >= filteredFlashcards.size()) {
-                currentIndex = 0;
-            }
-
+            currentIndex = Math.max(0, Math.min(currentIndex, filteredFlashcards.size() - 1));
             displayFlashcard();
 
         } catch (SQLException e) {
@@ -150,62 +137,38 @@ public class DeckReviewController {
         }
     }
 
-    private void enableNavigation() {
-        saveBtn.setDisable(false);
-        frontTextArea.setDisable(false);
-        backTextArea.setDisable(false);
-        statusComboBox.setDisable(false);
-    }
-
-    /**
-     * Displays the current flashcard in the UI and updates navigation buttons.
-     */
     private void displayFlashcard() {
-        if (filteredFlashcards == null || filteredFlashcards.isEmpty()) {
-            return;
-        }
-
-        enableNavigation();
         currentFlashcard = filteredFlashcards.get(currentIndex);
+        setReviewControlsDisabled(false);
+        showingFront = true;
+        setFaceVisible(true);
 
-        // Update read-only fields
-        creationDateField.setText(DateTimeUtil.utcToLocal(currentFlashcard.creationDate()));
-
-        // Update last reviewed to current date/time
-        LocalDateTime now = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        lastReviewedField.setText(now.format(formatter));
-
-        // Update editable fields
         isLoading = true;
         frontTextArea.setText(currentFlashcard.frontText());
         backTextArea.setText(currentFlashcard.backText());
         statusComboBox.setValue(currentFlashcard.status());
+        creationDateField.setText(formatDate(currentFlashcard.creationDate()));
+        lastReviewedField.setText(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
         isLoading = false;
 
-        // Update card count
         cardCountLabel.setText((currentIndex + 1) + " / " + filteredFlashcards.size());
-
-        // Update navigation buttons
         previousBtn.setDisable(currentIndex == 0);
         nextBtn.setDisable(currentIndex == filteredFlashcards.size() - 1);
 
-        // Clear status and modification flag
         statusLabel.setText("");
         isModified = false;
 
-        // Update last_viewed timestamp in database
         try {
             flashcardDao.updateLastViewed(currentFlashcard.id());
         } catch (SQLException e) {
-            // Log but don't interrupt the user experience
-            System.err.println("Failed to update last_viewed: " + e.getMessage());
+            System.err.println("Could not update last reviewed date: " + e.getMessage());
         }
     }
 
-    /**
-     * Clears all editable fields when no flashcards are available.
-     */
+    private String formatDate(String utcDate) {
+        return utcDate == null ? "" : DateTimeUtil.utcToLocal(utcDate);
+    }
+
     private void clearFields() {
         isLoading = true;
         frontTextArea.clear();
@@ -214,134 +177,106 @@ public class DeckReviewController {
         creationDateField.clear();
         lastReviewedField.clear();
         isLoading = false;
+
+        currentFlashcard = null;
         isModified = false;
+        setFaceVisible(true);
     }
 
-    /**
-     * Disables navigation and save buttons when no flashcards are available.
-     */
-    private void disableNavigation() {
-        previousBtn.setDisable(true);
-        nextBtn.setDisable(true);
-        saveBtn.setDisable(true);
-        frontTextArea.setDisable(true);
-        backTextArea.setDisable(true);
-        statusComboBox.setDisable(true);
+    private void setReviewControlsDisabled(boolean disabled) {
+        frontTextArea.setDisable(disabled);
+        backTextArea.setDisable(disabled);
+        statusComboBox.setDisable(disabled);
+        saveBtn.setDisable(disabled);
+        flipBtn.setDisable(disabled);
+        previousBtn.setDisable(disabled || currentIndex == 0);
+        nextBtn.setDisable(disabled || filteredFlashcards == null || currentIndex >= filteredFlashcards.size() - 1);
     }
 
-    /**
-     * Shows a 3-button unsaved changes dialog.
-     * Returns the ButtonType the user clicked.
-     */
-    private ButtonType showUnsavedChangesDialog(String context) {
-        ButtonType saveBtnType   = new ButtonType("Save",    ButtonBar.ButtonData.OK_DONE);
-        ButtonType discardBtnType = new ButtonType("Discard", ButtonBar.ButtonData.NO);
-        ButtonType cancelBtnType = new ButtonType("Cancel",  ButtonBar.ButtonData.CANCEL_CLOSE);
+    @FXML
+    public void flipCard() {
+        if (isFlipping || filteredFlashcards == null || filteredFlashcards.isEmpty()) {
+            return;
+        }
 
-        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
-                "Do you want to save before " + context + "?",
-                saveBtnType, discardBtnType, cancelBtnType);
-        confirm.setTitle("Unsaved Changes");
-        confirm.setHeaderText("You have unsaved changes");
+        isFlipping = true;
 
-        return confirm.showAndWait().orElse(cancelBtnType);
+        ScaleTransition shrink = new ScaleTransition(Duration.millis(140), cardStackPane);
+        shrink.setFromX(1.0);
+        shrink.setToX(0.0);
+
+        shrink.setOnFinished(e -> {
+            showingFront = !showingFront;
+            setFaceVisible(showingFront);
+
+            ScaleTransition expand = new ScaleTransition(Duration.millis(140), cardStackPane);
+            expand.setFromX(0.0);
+            expand.setToX(1.0);
+            expand.setOnFinished(ev -> isFlipping = false);
+            expand.play();
+        });
+
+        shrink.play();
     }
 
-    /**
-     * Handles filter selection change.
-     * Reloads flashcards based on the new filter.
-     */
+    private void setFaceVisible(boolean showFront) {
+        frontFace.setVisible(showFront);
+        frontFace.setManaged(showFront);
+        backFace.setVisible(!showFront);
+        backFace.setManaged(!showFront);
+    }
+
     @FXML
     private void onFilterChanged() {
-        if (isLoading) return;
-        if (isModified) {
-            ButtonType result = showUnsavedChangesDialog("changing the filter");
-            if (result.getButtonData() == ButtonBar.ButtonData.OK_DONE) {
-                saveCurrentFlashcard();
-            } else if (result.getButtonData() == ButtonBar.ButtonData.CANCEL_CLOSE) {
-                isLoading = true;
-                filterComboBox.setValue(lastCommittedFilter);
-                isLoading = false;
-                return;
-            }
-        }
+        if (isLoading || currentDeck == null) return;
+        if (!confirmSaveIfModified("changing the filter")) return;
 
         lastCommittedFilter = filterComboBox.getValue();
         currentIndex = 0;
         loadFilteredFlashcards();
     }
 
-    /**
-     * Navigates to the next flashcard.
-     */
     @FXML
     private void onNext() {
-        if (isModified) {
-            ButtonType result = showUnsavedChangesDialog("moving to the next card");
-            if (result.getButtonData() == ButtonBar.ButtonData.OK_DONE) {
-                saveCurrentFlashcard();
-            } else if (result.getButtonData() == ButtonBar.ButtonData.CANCEL_CLOSE) {
-                return;
-            }
-        }
+        if (!confirmSaveIfModified("moving to the next card")) return;
 
-        if (currentIndex < filteredFlashcards.size() - 1) {
+        if (filteredFlashcards != null && currentIndex < filteredFlashcards.size() - 1) {
             currentIndex++;
             displayFlashcard();
         }
     }
 
-    /**
-     * Navigates to the previous flashcard.
-     */
     @FXML
     private void onPrevious() {
-        if (isModified) {
-            ButtonType result = showUnsavedChangesDialog("moving to the previous card");
-            if (result.getButtonData() == ButtonBar.ButtonData.OK_DONE) {
-                saveCurrentFlashcard();
-            } else if (result.getButtonData() == ButtonBar.ButtonData.CANCEL_CLOSE) {
-                return;
-            }
-        }
+        if (!confirmSaveIfModified("moving to the previous card")) return;
 
-        if (currentIndex > 0) {
+        if (filteredFlashcards != null && currentIndex > 0) {
             currentIndex--;
             displayFlashcard();
         }
     }
 
-    /**
-     * Saves the current flashcard's modifications to the database.
-     */
     @FXML
     private void onSave() {
         saveCurrentFlashcard();
     }
 
-    /**
-     * Internal method to save the current flashcard.
-     */
-    private void saveCurrentFlashcard() {
-        if (currentFlashcard == null) {
-            return;
-        }
+    private boolean saveCurrentFlashcard() {
+        if (currentFlashcard == null) return true;
 
         String front = frontTextArea.getText().trim();
         String back = backTextArea.getText().trim();
         String status = statusComboBox.getValue();
 
-        // Validation
         if (front.isEmpty() || back.isEmpty() || status == null) {
             AlertHelper.showAlert(Alert.AlertType.ERROR, "Validation Error",
                     "Front text, back text, and status are required.");
-            return;
+            return false;
         }
 
         try {
             flashcardDao.updateFlashcard(currentFlashcard.id(), front, back, status);
 
-            // Update the current flashcard object
             currentFlashcard = new Flashcard(
                     currentFlashcard.id(),
                     currentFlashcard.deckId(),
@@ -352,68 +287,80 @@ public class DeckReviewController {
                     currentFlashcard.creationDate(),
                     currentFlashcard.lastViewed()
             );
-
-            // Update in the filtered list
             filteredFlashcards.set(currentIndex, currentFlashcard);
 
-            statusLabel.setText("✓ Flashcard saved successfully!");
             isModified = false;
+            statusLabel.setText("✓ Flashcard saved successfully!");
+            return true;
 
         } catch (SQLException e) {
             AlertHelper.showAlert(Alert.AlertType.ERROR, "Database Error",
                     "Could not save flashcard:\n" + e.getMessage());
+            return false;
         }
     }
 
-    /**
-     * Navigates back to the Review page (deck list).
-     */
+    private boolean confirmSaveIfModified(String action) {
+        if (!isModified) return true;
+
+        ButtonType result = showUnsavedChangesDialog(action);
+
+        if (result.getButtonData() == ButtonBar.ButtonData.OK_DONE) {
+            return saveCurrentFlashcard();
+        }
+
+        if (result.getButtonData() == ButtonBar.ButtonData.CANCEL_CLOSE) {
+            isLoading = true;
+            filterComboBox.setValue(lastCommittedFilter);
+            isLoading = false;
+            return false;
+        }
+
+        isModified = false; // discard changes
+        return true;
+    }
+
+    private ButtonType showUnsavedChangesDialog(String action) {
+        ButtonType save = new ButtonType("Save", ButtonBar.ButtonData.OK_DONE);
+        ButtonType discard = new ButtonType("Discard", ButtonBar.ButtonData.NO);
+        ButtonType cancel = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
+                "Do you want to save before " + action + "?", save, discard, cancel);
+        alert.setTitle("Unsaved Changes");
+        alert.setHeaderText("You have unsaved changes");
+        return alert.showAndWait().orElse(cancel);
+    }
+
     @FXML
     private void onCancel(ActionEvent event) {
-        if (isModified) {
-            ButtonType result = showUnsavedChangesDialog("leaving");
-            if (result.getButtonData() == ButtonBar.ButtonData.OK_DONE) {
-                saveCurrentFlashcard();
-            } else if (result.getButtonData() == ButtonBar.ButtonData.CANCEL_CLOSE) {
-                return;
-            }
-        }
-
-        try {
-            FXMLLoader loader = new FXMLLoader(
-                    Main.class.getResource("view/review-view.fxml"));
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            stage.setScene(new Scene(loader.load(), 700, 600));
-            stage.show();
-        } catch (IOException e) {
-            AlertHelper.showAlert(Alert.AlertType.ERROR, "Navigation Error",
-                    "Could not return to review page:\n" + e.getMessage());
+        if (confirmSaveIfModified("leaving")) {
+            navigateTo(event, "view/review-view.fxml", "Could not return to review page");
         }
     }
 
-    /**
-     * Navigates back to the home page.
-     */
+    private void onCardClicked(MouseEvent event) {
+        if (event.getTarget() == cardStackPane) {
+            flipCard();
+        }
+    }
+
     @FXML
     private void goBackHomeOp(ActionEvent event) {
-        if (isModified) {
-            ButtonType result = showUnsavedChangesDialog("leaving");
-            if (result.getButtonData() == ButtonBar.ButtonData.OK_DONE) {
-                saveCurrentFlashcard();
-            } else if (result.getButtonData() == ButtonBar.ButtonData.CANCEL_CLOSE) {
-                return;
-            }
+        if (confirmSaveIfModified("leaving")) {
+            navigateTo(event, "view/home-view.fxml", "Could not return home");
         }
+    }
 
+    private void navigateTo(ActionEvent event, String fxmlPath, String errorMessage) {
         try {
-            FXMLLoader loader = new FXMLLoader(
-                    Main.class.getResource("view/home-view.fxml"));
+            FXMLLoader loader = new FXMLLoader(Main.class.getResource(fxmlPath));
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             stage.setScene(new Scene(loader.load(), 700, 600));
             stage.show();
         } catch (IOException e) {
             AlertHelper.showAlert(Alert.AlertType.ERROR, "Navigation Error",
-                    "Could not return home:\n" + e.getMessage());
+                    errorMessage + ":\n" + e.getMessage());
         }
     }
 }

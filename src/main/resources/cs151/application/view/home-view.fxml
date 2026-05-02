@@ -32,6 +32,7 @@
         </items>
     </MenuButton>
     <Button text="Review Deck" styleClass="home-btns" onAction="#goToReviewOp"/>
+    <Button text="Report" styleClass="home-btns" onAction="#goToReportOp"/>
     <Button text="Search All Flashcards" styleClass="home-btns" onAction="#goToSearchFlashcardsOp"/>
     <Button text="Close Program" styleClass="home-btns" onAction="#onCloseButtonClickOp"/>
 </VBox>
