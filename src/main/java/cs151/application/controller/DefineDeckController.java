@@ -95,30 +95,41 @@ public class DefineDeckController {
 
             // --- Validate: name cannot be empty ---
             if (name.isEmpty()) {
-                promptMsgLbl.setText("Deck name cannot be empty.");
+                showError("Deck name cannot be empty.");
                 return;
             }
 
             // --- Validate: name length ---
             if (name.length() > 255) {
-                promptMsgLbl.setText("Deck name must be 255 characters or fewer.");
+                showError("Deck name must be 255 characters or fewer.");
                 return;
             }
 
             // --- Validate: name must be unique ---
             if (deckDao.getDeckByName(name) != null) {
-                promptMsgLbl.setText("A deck named \"" + name + "\" already exists.");
+                showError("A deck named \"" + name + "\" already exists.");
                 return;
             }
 
             // --- Save to database ---
             deckDao.insertDeck(name, description.isEmpty() ? null : description);
 
-            promptMsgLbl.setText("New Deck \"" + name + "\" successfully created");
-
+            showSuccess("✓ New Deck \"" + name + "\" successfully created");
         } catch (Exception e) {
-            promptMsgLbl.setText("Error: " + e.getMessage());
+            showError("Error: " + e.getMessage());
             logger.error("Failed to create deck: {}", e.getMessage(), e);
         }
     }
+
+    private void showError(String message) {
+        promptMsgLbl.setText(message);
+        promptMsgLbl.getStyleClass().setAll("prompt-label", "error-label");
+    }
+
+    private void showSuccess(String message) {
+        promptMsgLbl.setText(message);
+        promptMsgLbl.getStyleClass().setAll("prompt-label", "success-label");
+    }
+
+
 }

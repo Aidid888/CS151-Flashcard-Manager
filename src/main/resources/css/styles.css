@@ -35,13 +35,19 @@
 /* Define Deck styling */
 #deckNameField {
     -fx-font-size: 12px;
-    -fx-font-family: "Microsoft JhengHei UI Bold";
 }
 
 .prompt-label {
     -fx-font-size: 12px;
-    -fx-font-family: "Microsoft JhengHei UI Bold";
-    -fx-text-fill: #b84747;
+    -fx-font-weight: bold;
+}
+
+.error-label {
+    -fx-text-fill: #c0392b;
+}
+
+.success-label {
+    -fx-text-fill: #27ae60;
 }
 
 .pane-layer {
@@ -92,7 +98,6 @@
     -fx-font-size: 13px;
 }
 
-
 /* ═══════════════════════════════════════════════════════════
    Root / Scene background
    ═══════════════════════════════════════════════════════════ */
@@ -133,8 +138,9 @@
 /* "x / y" card counter */
 .card-count-label {
     -fx-font-size: 13px;
-    -fx-text-fill: #888899;
+    -fx-text-fill: #1E1E2E;
     -fx-font-style: italic;
+
 }
 
 /* Transient save / error feedback */
@@ -144,27 +150,26 @@
     -fx-min-height: 18px;  /* keeps layout stable when empty */
 }
 
-/*!* ═══════════════════════════════════════════════════════════*/
-/*   Flash Card widget*/
-/*   ═══════════════════════════════════════════════════════════ *!*/
+/* ═══════════════════════════════════════════════════════════
+   Flash Card widget
+   ═══════════════════════════════════════════════════════════ */
 
-/*!* Outer container — the animated StackPane *!*/
-/*.flash-card {*/
-/*    -fx-background-color: white;*/
-/*    -fx-background-radius: 14px;*/
-/*    -fx-border-color: #DDDDE8;*/
-/*    -fx-border-width: 1px;*/
-/*    -fx-border-radius: 14px;*/
-/*    -fx-effect: dropshadow(gaussian, rgba(60,55,120,0.13), 18, 0.0, 0, 4);*/
-/*    -fx-min-height: 220px;*/
-/*    -fx-cursor: hand;*/
-/*}*/
+/* Outer container — the animated StackPane */
+.flash-card {
+    -fx-background-color: #d7d4de;
+    -fx-background-radius: 14px;
+    -fx-border-color: #c1b2cc;
+    -fx-border-width: 1px;
+    -fx-border-radius: 14px;
+    -fx-effect: dropshadow(gaussian, rgba(60,55,120,0.13), 18, 0.0, 0, 4);
+    -fx-min-height: 220px;
+    -fx-cursor: hand;
+}
 
-/*!* Each face VBox (front / back) — fills the StackPane *!*/
-/*.card-face {*/
-/*    -fx-background-color: transparent;*/
-/*    -fx-min-height: 220px;*/
-/*}*/
+/* Each face VBox (front / back) — fills the StackPane */
+.card-face {
+    -fx-min-height: 220px;
+}
 
 /* FRONT badge */
 .front-badge {
@@ -191,38 +196,27 @@
     /* nothing extra needed — specifics live in front-badge / back-badge */
 }
 
-/*!* Text area inside the card — styled to look like part of the card, not a form field *!*/
-/*.card-textarea {*/
-/*    -fx-background-color: transparent;*/
-/*    -fx-border-color: transparent;*/
-/*    -fx-border-width: 0;*/
-/*    -fx-background-radius: 0;*/
-/*    -fx-font-size: 15px;*/
-/*    -fx-text-fill: #1E1E2E;*/
-/*    -fx-font-family: "Trebuchet MS", "Segoe UI", sans-serif;*/
-/*    -fx-padding: 6 2 6 2;*/
-/*    -fx-focus-color: transparent;*/
-/*    -fx-faint-focus-color: transparent;*/
-/*}*/
+/* Remove the blue focus ring that JavaFX adds to TextArea */
+.card-textarea:focused {
+    -fx-background-color: transparent;
+    -fx-effect: none;
+}
 
-/*!* Remove the blue focus ring that JavaFX adds to TextArea *!*/
-/*.card-textarea:focused {*/
-/*    -fx-background-color: transparent;*/
-/*    -fx-effect: none;*/
-/*}*/
+/* Larger, centered flashcard text */
+.card-textarea {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-alignment: center;
+    -fx-padding: 4 8 4 8;
+}
 
-/*!* Inner scroll pane (JavaFX wraps TextArea content in a scroll pane) *!*/
-/*.card-textarea .scroll-pane {*/
-/*    -fx-background-color: transparent;*/
-/*}*/
 
-/*.card-textarea .scroll-pane .viewport {*/
-/*    -fx-background-color: transparent;*/
-/*}*/
-
-/*.card-textarea .content {*/
-/*    -fx-background-color: transparent;*/
-/*}*/
+/* Slightly tighter flashcard */
+.flash-card {
+    -fx-min-height: 240px;
+    -fx-pref-height: 260px;
+    -fx-max-height: 260px;
+}
 
 /* ═══════════════════════════════════════════════════════════
    Date / read-only fields
@@ -340,8 +334,15 @@
     -fx-border-radius: 7px;
 }
 
+.statusLabel:focused,
 .combo-box:focused {
     -fx-border-color: #3A3560;
+}
+
+.statusLabel:hover,
+.combo-box:hover {
+    -fx-border-color: #3A3560;
+    -fx-cursor: hand;
 }
 
 .combo-box .list-cell {
