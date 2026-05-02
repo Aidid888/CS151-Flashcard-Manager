@@ -1,11 +1,16 @@
 # Name of application: Flashcard Manager
-### Version: 0.7
+### Version: 0.8
 
 ## Who did what:
 
+### Version: 0.8
+1. Aiden Tat: Modified text fields, Modified database
+2. Andrew Song: Developed review deck
+3. Katherine Shih: 
+
 ### Version: 0.7
 1. Aiden Tat: Modified edit feature, Fixed database 
-2. Andrew Song: Set time to local instead of UTC, edit time feature, fixed edit 
+2. Andrew Song: Set time to local instead of UTC, Edit time feature, Fixed edit 
 3. Katherine Shih: Modified window, Developed alert class, fixed documentation
 
 ### Version: 0.6
@@ -21,7 +26,7 @@
 ### Version: 0.4
 1. Aiden Tat: Developed database
 2. Andrew Song: Developed table view page
-3. Katherine Shih: Designed list and define deck, fixed text fields
+3. Katherine Shih: Designed list and define deck, Fixed text fields
 
 ### Version: 0.2
 1. Aiden Tat: Designed buttons and navigation

@@ -29,7 +29,11 @@
     </ButtonBar>
 
     <!-- Title -->
-    <Label styleClass="title-label" text="Review Decks" />
+    <Label styleClass="title-label" text="Review" />
+
+    <Label text="Select a deck to review all associated flashcards." />
+    <Label text="Search is case-insensitive. Matches Deck Name and Deck Description." />
+
 
     <!-- Search bar -->
     <TextField fx:id="searchField"
@@ -47,6 +51,6 @@
         </columns>
     </TableView>
 
-    <Label text="Double-click a deck to start reviewing" style="-fx-text-fill: gray; -fx-font-size: 11px;" />
+    <Label text="Double-click a deck to start reviewing" style="-fx-text-fill: gray; -fx-font-size: 11px; -fx-font-weight: bold" />
 
 </VBox>

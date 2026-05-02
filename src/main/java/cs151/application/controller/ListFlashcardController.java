@@ -17,10 +17,10 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.geometry.Pos;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 import cs151.application.util.DateTimeUtil;
@@ -55,6 +55,7 @@ public class ListFlashcardController {
         flashcardTable.setColumnResizePolicy(
                 TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
 
+        // setup columns
         deckNameColumn.setCellValueFactory(cell ->
                 new SimpleStringProperty(cell.getValue().deckName()));
         frontTextColumn.setCellValueFactory(cell ->
@@ -74,10 +75,13 @@ public class ListFlashcardController {
             }
             return new SimpleStringProperty(DateTimeUtil.utcToLocal(lastViewed));
         });
+
+        // setup delete button
         deleteColumn.setCellFactory(col -> new TableCell<>() {
-            private final Button deleteBtn = new Button("Delete");
+            private final Button deleteBtn = new Button("✕");
             {
                 deleteBtn.setStyle("-fx-background-color: #c0392b; -fx-text-fill: white;");
+                setAlignment(Pos.CENTER); // centers the button inside the table cell
                 deleteBtn.setOnAction(e -> {
                     Flashcard card = getTableView().getItems().get(getIndex());
                     Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
@@ -102,7 +106,11 @@ public class ListFlashcardController {
             }
         });
 
+        // setup table items
         flashcardTable.setItems(flashcardList);
+
+        // setup double click
+        // setup combo box
         flashcardTable.setRowFactory(tv -> {
             TableRow<Flashcard> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
@@ -117,8 +125,10 @@ public class ListFlashcardController {
         deckComboBox.setCellFactory(lv -> new DeckCell());
         deckComboBox.setButtonCell(new DeckCell());
 
+        // load decks
         loadDeckComboBox();
 
+        // load flashcards
         // Default: show all flashcards until a deck is selected
         loadAllFlashcards();
     }

@@ -53,7 +53,7 @@
             <TableColumn fx:id="statusColumn"       prefWidth="100" text="Status" />
             <TableColumn fx:id="creationDateColumn" prefWidth="160" text="Created" />
             <TableColumn fx:id="lastViewedColumn"   prefWidth="160" text="Last Reviewed" />
-            <TableColumn fx:id="deleteColumn"       prefWidth="80"  text="Action" />
+            <TableColumn fx:id="deleteColumn"       prefWidth="90"  text="Delete" />
         </columns>
     </TableView>
 

@@ -86,7 +86,7 @@
     -fx-font-size: 13px;
 }
 
-/* Style the text node inside */
+/* Style text node inside flashcard */
 .deck-description .text {
     -fx-fill: #555555;
     -fx-font-size: 13px;

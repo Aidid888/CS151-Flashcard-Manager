@@ -25,13 +25,13 @@
     <!-- Navigation Buttons -->
     <Button text="Define New Deck" styleClass="home-btns" onAction="#goToDefineDeckOp"/>
     <Button text="Define New Flashcard" styleClass="home-btns" onAction="#goToDefineFlashcardsOp"/>
-    <Button text="Review Decks" styleClass="home-btns" onAction="#goToReviewOp"/>
-    <MenuButton fx:id="viewEditMenuBtn" text="View/Edit" styleClass="home-btns">
+    <MenuButton fx:id="viewEditMenuBtn" text="View / Edit" styleClass="home-btns">
         <items>
             <MenuItem text="Decks" onAction="#goToListDecksOp"/>
             <MenuItem text="Flashcards" onAction="#goToListFlashcardsOp"/>
         </items>
     </MenuButton>
-    <Button text="Search Flashcards" styleClass="home-btns" onAction="#goToSearchFlashcardsOp"/>
+    <Button text="Review Deck" styleClass="home-btns" onAction="#goToReviewOp"/>
+    <Button text="Search All Flashcards" styleClass="home-btns" onAction="#goToSearchFlashcardsOp"/>
     <Button text="Close Program" styleClass="home-btns" onAction="#onCloseButtonClickOp"/>
 </VBox>

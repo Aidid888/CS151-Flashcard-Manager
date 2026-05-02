@@ -38,7 +38,7 @@
             <TableColumn fx:id="descColumn"            prefWidth="200" text="Description" />
             <TableColumn fx:id="creationDateColumn"    prefWidth="130" text="Created" />
             <TableColumn fx:id="lastVisitedColumn"     prefWidth="130" text="Last Visited" />
-            <TableColumn fx:id="totalFlashcardsInDeck" prefWidth="100" text="Num Flashcards" />
+            <TableColumn fx:id="totalFlashcardsInDeck" prefWidth="100" text="# Flashcards" />
             <TableColumn fx:id="actionsColumn"         prefWidth="80"  text="Actions" />
         </columns>
     </TableView>
