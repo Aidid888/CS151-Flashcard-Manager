@@ -182,11 +182,15 @@ public class ListDeckController {
      */
     private void handleUpdateDeck(Deck deck) {
         // --- Editable fields ---
-        TextField nameField = new TextField(deck.deckName());
+        TextArea nameField = new TextArea(deck.deckName());
         nameField.setPromptText("Deck name");
+        nameField.setPrefRowCount(2);
+        nameField.setWrapText(true);
 
-        TextField descField = new TextField(deck.description() == null ? "" : deck.description());
+        TextArea descField = new TextArea(deck.description() == null ? "" : deck.description());
         descField.setPromptText("Description (optional)");
+        descField.setPrefRowCount(4);
+        descField.setWrapText(true);
 
         // --- Read-only: Creation Date ---
         String creationDateStr = deck.creationDate() == null
@@ -226,6 +230,8 @@ public class ListDeckController {
                 new Label("Last Viewed:"), lastViewedField
         );
         content.setPadding(new javafx.geometry.Insets(10));
+        dialog.getDialogPane().setMinWidth(400);
+        dialog.getDialogPane().setMinHeight(350);
         dialog.getDialogPane().setContent(content);
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
