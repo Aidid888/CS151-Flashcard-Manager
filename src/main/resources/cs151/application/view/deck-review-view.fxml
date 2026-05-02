@@ -29,7 +29,7 @@
     <HBox alignment="CENTER_LEFT" spacing="12">
         <Button onAction="#goBackHomeOp" styleClass="back-btn" text="⌂ Back to Home" />
         <Region HBox.hgrow="ALWAYS" />
-        <Label styleClass="deck-title-label" text="Deck Name:" />
+        <Label styleClass="field-label" text="Deck Name:" />
         <Label fx:id="deckNameLabel" styleClass="deck-title-label" text="Deck" />
     </HBox>
 
@@ -37,8 +37,8 @@
     <HBox alignment="CENTER_LEFT" spacing="12">
         <Label styleClass="field-label" text=" Status Filter:" />
         <ComboBox fx:id="filterComboBox" onAction="#onFilterChanged" prefWidth="140" />
-        <Region HBox.hgrow="ALWAYS" />
         <Label fx:id="cardCountLabel" styleClass="card-count-label" text="— / —" />
+        <Region HBox.hgrow="ALWAYS" />
     </HBox>
 
     <!--
@@ -50,11 +50,12 @@
     <StackPane fx:id="cardStackPane" styleClass="flash-card" VBox.vgrow="ALWAYS">
 
         <!-- FRONT FACE -->
-        <VBox fx:id="frontFace" styleClass="card-face" alignment="TOP_LEFT" spacing="8">
-            <padding><Insets bottom="18" left="22" right="22" top="16" /></padding>
+        <VBox fx:id="frontFace" styleClass="card-face" alignment="TOP_LEFT" spacing="6">
+            <padding><Insets bottom="18" left="22" right="22" top="10" /></padding>
             <HBox alignment="CENTER_LEFT" spacing="10">
                 <Label styleClass="face-badge, front-badge" text="FRONT" />
                 <Region HBox.hgrow="ALWAYS" />
+                <Label style="-fx-font-size: 10" text="Click Corner to Flip ↻" />
             </HBox>
             <TextArea fx:id="frontTextArea"
                       styleClass="card-textarea"
@@ -63,12 +64,14 @@
         </VBox>
 
         <!-- BACK FACE (hidden by default) -->
-        <VBox fx:id="backFace" styleClass="card-face" alignment="TOP_LEFT" spacing="8"
+        <VBox fx:id="backFace" styleClass="card-face" alignment="TOP_LEFT" spacing="6"
               visible="false" managed="false">
-            <padding><Insets bottom="18" left="22" right="22" top="16" /></padding>
+            <padding><Insets bottom="18" left="22" right="22" top="10" /></padding>
             <HBox alignment="CENTER_LEFT" spacing="10">
                 <Label styleClass="face-badge, back-badge" text="BACK" />
                 <Region HBox.hgrow="ALWAYS" />
+                <Label style="-fx-font-size: 10" text="Click Corner to Flip ↻" />
+
             </HBox>
             <TextArea fx:id="backTextArea"
                       styleClass="card-textarea"
@@ -104,7 +107,7 @@
     <Label fx:id="statusLabel" styleClass="status-feedback-label" />
 
     <!-- Navigation + action buttons -->
-    <HBox alignment="CENTER" spacing="10">
+    <HBox alignment="CENTER" spacing="5">
         <Button fx:id="previousBtn" onAction="#onPrevious"
                 styleClass="nav-btn" text="← Prev" prefWidth="90" />
         <Button fx:id="nextBtn" onAction="#onNext"
