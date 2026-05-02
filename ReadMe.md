@@ -5,8 +5,8 @@
 
 ### Version: 0.8
 1. Aiden Tat: Modified text fields, Modified database
-2. Andrew Song: Developed review deck
-3. Katherine Shih: 
+2. Andrew Song: Developed review deck page
+3. Katherine Shih: Designed review and tableview GUI
 
 ### Version: 0.7
 1. Aiden Tat: Modified edit feature, Fixed database 
