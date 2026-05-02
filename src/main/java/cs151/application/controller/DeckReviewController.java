@@ -267,10 +267,13 @@ public class DeckReviewController {
         String front = frontTextArea.getText().trim();
         String back = backTextArea.getText().trim();
         String status = statusComboBox.getValue();
+        String oldStatus = currentFlashcard.status();
 
         if (front.isEmpty() || back.isEmpty() || status == null) {
             AlertHelper.showAlert(Alert.AlertType.ERROR, "Validation Error",
                     "Front text, back text, and status are required.");
+
+            reloadCurrentFlashcardFromDatabase();
             return false;
         }
 
@@ -287,15 +290,28 @@ public class DeckReviewController {
                     currentFlashcard.creationDate(),
                     currentFlashcard.lastViewed()
             );
-            filteredFlashcards.set(currentIndex, currentFlashcard);
+
+            boolean statusChanged = !oldStatus.equals(status);
+            boolean filterIsAll = "All".equals(filterComboBox.getValue());
+
+            // If status changed while using a specific filter,
+            // reload the filtered list so the card counter updates correctly.
+            if (statusChanged && !filterIsAll) {
+                loadFilteredFlashcards();
+                statusLabel.setText("✓ Flashcard saved. Filter refreshed.");
+            } else {
+                filteredFlashcards.set(currentIndex, currentFlashcard);
+                cardCountLabel.setText((currentIndex + 1) + " / " + filteredFlashcards.size());
+                statusLabel.setText("✓ Flashcard saved successfully!");
+            }
 
             isModified = false;
-            statusLabel.setText("✓ Flashcard saved successfully!");
             return true;
 
         } catch (SQLException e) {
             AlertHelper.showAlert(Alert.AlertType.ERROR, "Database Error",
                     "Could not save flashcard:\n" + e.getMessage());
+            reloadCurrentFlashcardFromDatabase();
             return false;
         }
     }
@@ -330,6 +346,52 @@ public class DeckReviewController {
         alert.setTitle("Unsaved Changes");
         alert.setHeaderText("You have unsaved changes");
         return alert.showAndWait().orElse(cancel);
+    }
+
+    private void reloadCurrentFlashcardFromDatabase() {
+        if (currentFlashcard == null) return;
+
+        try {
+            Flashcard savedFlashcard = flashcardDao.getFlashcardById(currentFlashcard.id());
+
+            if (savedFlashcard == null) {
+                clearFields();
+                setReviewControlsDisabled(true);
+                statusLabel.setText("This flashcard no longer exists in the database.");
+                return;
+            }
+
+            currentFlashcard = savedFlashcard;
+
+            if (filteredFlashcards != null
+                    && currentIndex >= 0
+                    && currentIndex < filteredFlashcards.size()) {
+                filteredFlashcards.set(currentIndex, savedFlashcard);
+            }
+
+            isLoading = true;
+            frontTextArea.setText(savedFlashcard.frontText());
+            backTextArea.setText(savedFlashcard.backText());
+            statusComboBox.setValue(savedFlashcard.status());
+            creationDateField.setText(formatDate(savedFlashcard.creationDate()));
+            lastReviewedField.setText(formatDate(savedFlashcard.lastViewed()));
+            isLoading = false;
+
+            isModified = false;
+            statusLabel.setText("Changes were not saved.");
+
+        } catch (SQLException reloadError) {
+            isLoading = true;
+            frontTextArea.setText(currentFlashcard.frontText());
+            backTextArea.setText(currentFlashcard.backText());
+            statusComboBox.setValue(currentFlashcard.status());
+            creationDateField.setText(formatDate(currentFlashcard.creationDate()));
+            lastReviewedField.setText(formatDate(currentFlashcard.lastViewed()));
+            isLoading = false;
+
+            isModified = false;
+            statusLabel.setText("Changes were not saved. Showing last loaded version.");
+        }
     }
 
     @FXML

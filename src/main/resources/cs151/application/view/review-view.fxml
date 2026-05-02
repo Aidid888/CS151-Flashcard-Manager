@@ -31,9 +31,7 @@
     <!-- Title -->
     <Label styleClass="title-label" text="Review" />
 
-    <Label text="Select a deck to review all associated flashcards." />
-    <Label text="Search is case-insensitive. Matches Deck Name and Deck Description." />
-
+    <Label style="-fx-font-size: 12px; -fx-font-weight: italic" text="Select a deck to review all associated flashcards." />
 
     <!-- Search bar -->
     <TextField fx:id="searchField"

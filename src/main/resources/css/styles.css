@@ -1,15 +1,6 @@
 /* General styling */
-.root {
-    -fx-background-color: #d3ddf0;
-}
-
 .button {
     -fx-font-size: 12px;
-    -fx-font-family: "Microsoft JhengHei UI";
-}
-
-.back-btn {
-    -fx-font-family: "Microsoft YaHei UI Light";
 }
 
 .title-label {
@@ -158,7 +149,7 @@
 .flash-card {
     -fx-background-color: #d7d4de;
     -fx-background-radius: 14px;
-    -fx-border-color: #c1b2cc;
+    -fx-border-color: #a59aae;
     -fx-border-width: 1px;
     -fx-border-radius: 14px;
     -fx-effect: dropshadow(gaussian, rgba(60,55,120,0.13), 18, 0.0, 0, 4);
@@ -196,11 +187,11 @@
     /* nothing extra needed — specifics live in front-badge / back-badge */
 }
 
-/* Remove the blue focus ring that JavaFX adds to TextArea */
-.card-textarea:focused {
-    -fx-background-color: transparent;
-    -fx-effect: none;
-}
+/*!* Remove the blue focus ring that JavaFX adds to TextArea *!*/
+/*.card-textarea:focused {*/
+/*    -fx-background-color: transparent;*/
+/*    -fx-effect: none;*/
+/*}*/
 
 /* Larger, centered flashcard text */
 .card-textarea {
@@ -337,6 +328,8 @@
 .statusLabel:focused,
 .combo-box:focused {
     -fx-border-color: #3A3560;
+    -fx-background-color: #f3f3fd;
+
 }
 
 .statusLabel:hover,
@@ -404,7 +397,7 @@
 /* Keep TableView text readable when a row is selected or double-clicked */
 .table-row-cell:selected,
 .table-row-cell:focused:selected {
-    -fx-background-color: #cccdd1;
+    -fx-background-color: #bec0cc;
 }
 
 /* Fix text color inside selected rows */
