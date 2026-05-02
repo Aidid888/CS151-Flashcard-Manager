@@ -93,19 +93,19 @@
 }
 
 
-/*!* ═══════════════════════════════════════════════════════════*/
-/*   Root / Scene background*/
-/*   ═══════════════════════════════════════════════════════════ *!*/
-/*.root {*/
-/*    -fx-background-color: #d3ddf0;*/
-/*    -fx-font-family: "Trebuchet MS", "Segoe UI", sans-serif;*/
-/*    -fx-font-size: 13px;*/
-/*    -fx-text-fill: #1E1E2E;*/
-/*}*/
+/* ═══════════════════════════════════════════════════════════
+   Root / Scene background
+   ═══════════════════════════════════════════════════════════ */
+.root {
+    -fx-background-color: #d3ddf0;
+    -fx-font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+    -fx-font-size: 13px;
+    -fx-text-fill: #1E1E2E;
+}
 
-/*!* ═══════════════════════════════════════════════════════════*/
-/*   Typography*/
-/*   ═══════════════════════════════════════════════════════════ *!*/
+/* ═══════════════════════════════════════════════════════════
+   Typography
+   ═══════════════════════════════════════════════════════════ */
 
 /* Main page title (e.g., "Review Flashcards") */
 .title-label {
@@ -166,30 +166,30 @@
 /*    -fx-min-height: 220px;*/
 /*}*/
 
-/*!* FRONT badge *!*/
-/*.front-badge {*/
-/*    -fx-background-color: #E8F5E9;*/
-/*    -fx-text-fill: #2E7D32;*/
-/*    -fx-font-size: 10px;*/
-/*    -fx-font-weight: bold;*/
-/*    -fx-padding: 3 8 3 8;*/
-/*    -fx-background-radius: 20px;*/
-/*}*/
+/* FRONT badge */
+.front-badge {
+    -fx-background-color: #E8F5E9;
+    -fx-text-fill: #2E7D32;
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-padding: 3 8 3 8;
+    -fx-background-radius: 20px;
+}
 
-/*!* BACK badge *!*/
-/*.back-badge {*/
-/*    -fx-background-color: #E8EAF6;*/
-/*    -fx-text-fill: #3949AB;*/
-/*    -fx-font-size: 10px;*/
-/*    -fx-font-weight: bold;*/
-/*    -fx-padding: 3 8 3 8;*/
-/*    -fx-background-radius: 20px;*/
-/*}*/
+/* BACK badge */
+.back-badge {
+    -fx-background-color: #E8EAF6;
+    -fx-text-fill: #3949AB;
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-padding: 3 8 3 8;
+    -fx-background-radius: 20px;
+}
 
-/*!* Shared base for badges (applied alongside front-badge / back-badge) *!*/
-/*.face-badge {*/
-/*    !* nothing extra needed — specifics live in front-badge / back-badge *!*/
-/*}*/
+/* Shared base for badges (applied alongside front-badge / back-badge) */
+.face-badge {
+    /* nothing extra needed — specifics live in front-badge / back-badge */
+}
 
 /*!* Text area inside the card — styled to look like part of the card, not a form field *!*/
 /*.card-textarea {*/
@@ -301,9 +301,11 @@
 
 /* Navigation buttons (Prev / Next) */
 .nav-btn {
-    -fx-background-color: #EEEEF5;
+    -fx-background-color: #f4f4f6;
     -fx-border-color: transparent;
     -fx-text-fill: #3A3560;
+    -fx-border-color: #83827d;
+    -fx-border-width: 1.2px;
 }
 
 .nav-btn:hover {
@@ -367,14 +369,14 @@
 /* ═══════════════════════════════════════════════════════════
    TableView (used in Review list and Reports)
    ═══════════════════════════════════════════════════════════ */
-/*.table-view {*/
-/*    -fx-background-color: white;*/
-/*    -fx-border-color: #DDDDE8;*/
-/*    -fx-border-width: 1px;*/
-/*    -fx-background-radius: 8px;*/
-/*    -fx-border-radius: 8px;*/
-/*    -fx-effect: dropshadow(gaussian, rgba(60,55,120,0.07), 10, 0.0, 0, 2);*/
-/*}*/
+.table-view {
+    -fx-background-color: white;
+    -fx-border-color: #DDDDE8;
+    -fx-border-width: 1px;
+    -fx-background-radius: 8px;
+    -fx-border-radius: 8px;
+    -fx-effect: dropshadow(gaussian, rgba(60,55,120,0.07), 10, 0.0, 0, 2);
+}
 
 .table-view .column-header-background {
     -fx-background-color: #F0EFF8;
@@ -401,7 +403,7 @@
 /* Keep TableView text readable when a row is selected or double-clicked */
 .table-row-cell:selected,
 .table-row-cell:focused:selected {
-    -fx-background-color: #E8EAF6;
+    -fx-background-color: #cccdd1;
 }
 
 /* Fix text color inside selected rows */

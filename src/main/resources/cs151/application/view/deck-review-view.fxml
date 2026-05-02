@@ -29,12 +29,13 @@
     <HBox alignment="CENTER_LEFT" spacing="12">
         <Button onAction="#goBackHomeOp" styleClass="back-btn" text="⌂ Back to Home" />
         <Region HBox.hgrow="ALWAYS" />
+        <Label styleClass="deck-title-label" text="Deck Name:" />
         <Label fx:id="deckNameLabel" styleClass="deck-title-label" text="Deck" />
     </HBox>
 
     <!-- Filter row -->
     <HBox alignment="CENTER_LEFT" spacing="12">
-        <Label styleClass="field-label" text="Filter:" />
+        <Label styleClass="field-label" text=" Status Filter:" />
         <ComboBox fx:id="filterComboBox" onAction="#onFilterChanged" prefWidth="140" />
         <Region HBox.hgrow="ALWAYS" />
         <Label fx:id="cardCountLabel" styleClass="card-count-label" text="— / —" />
@@ -113,7 +114,7 @@
         <Button fx:id="saveBtn" onAction="#onSave"
                 styleClass="primary-btn" text="Save" prefWidth="90" />
         <Button onAction="#onCancel"
-                styleClass="secondary-btn" text="Back" prefWidth="90" />
+                styleClass="secondary-btn" text="Cancel / Back to Deck List" prefWidth="200" />
     </HBox>
 
 </VBox>
